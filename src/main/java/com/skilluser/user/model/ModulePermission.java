@@ -24,6 +24,7 @@ public class ModulePermission {
     private boolean canAdd;
     private boolean canEdit;
     private boolean canDelete;
+    private String path;
 
     private String createdAt;
 

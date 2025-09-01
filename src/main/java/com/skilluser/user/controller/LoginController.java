@@ -2,6 +2,8 @@ package com.skilluser.user.controller;
 
 import java.util.HashMap;
 
+import com.skilluser.user.model.User;
+import com.skilluser.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,41 +26,68 @@ import com.skilluser.user.dto.LoginRequest;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auth")
 public class LoginController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private JwtUtil jwtUtils;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-
         HashMap<Object, Object> response = new HashMap<>();
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
 
+        try {
+            // Load user by email
+            User user = userRepository.findByEmail(loginRequest.getEmail());
+
+
+            String rawPassword = loginRequest.getPassword();
+            String storedPassword = user.getPassword(); // could be hashed or plain
+
+            boolean isAuthenticated = false;
+
+            // Case 1: If stored password is BCrypt hashed
+            if (storedPassword != null && storedPassword.startsWith("$2a$")) {
+                isAuthenticated = passwordEncoder.matches(rawPassword, storedPassword);
+            }
+            // Case 2: If stored password is plain text
+            else if (storedPassword != null && storedPassword.equals(rawPassword)) {
+                isAuthenticated = true;
+
+
+                String newHashed = passwordEncoder.encode(rawPassword);
+                user.setPassword(newHashed);
+               // userRepository.save(user);
+            }
+
+            if (!isAuthenticated) {
+                throw new BadCredentialsException("Invalid credentials");
+            }
+
+            // Build authentication object manually since we skipped authenticationManager
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            String jwtToken = jwtUtils.generateToken(userDetails);
+            String jwtToken = jwtUtils.generateToken(user);
 
             response.put("token", jwtToken);
-            response.put("user", userDetails);
-            response.put("authority", userDetails.getAuthorities());
+            response.put("user", user);
+            response.put("authority", user.getAuthorities());
 
             return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
-
     }
+
 
 }

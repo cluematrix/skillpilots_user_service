@@ -76,6 +76,7 @@ public class ModuleServiceImpl implements ModuleService {
                   module.setCanEdit(m.isCanEdit());
                   module.setCanAdd(m.isCanAdd());
                   module.setCanDelete(m.isCanDelete());
+                  module.setPath(module.getPath());
                   list.add(module);
               }
 

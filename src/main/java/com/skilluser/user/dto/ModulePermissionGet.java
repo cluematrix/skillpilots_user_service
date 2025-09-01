@@ -11,4 +11,5 @@ public class ModulePermissionGet {
     private boolean canAdd;
     private boolean canEdit;
     private boolean canDelete;
+    private String path;
 }

@@ -15,6 +15,8 @@ public class Module {
     private Long id;
     private String name;
     private String createdAt;
+    private String path;
+    private boolean isActive;
 
     @PrePersist
     public void createdAt(){

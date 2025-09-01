@@ -15,6 +15,7 @@ public class Role {
     private Long id;
     private String name;
     private String createdAt;
+    private boolean isActive;
     @PrePersist
     public void createdAt(){
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
