@@ -1,5 +1,6 @@
 package com.skilluser.user.model;
 
+import com.skilluser.user.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class Module {
     private String name;
     private String createdAt;
     private String path;
+    private ServiceType serviceType;
     private boolean isActive;
 
     @PrePersist

@@ -2,6 +2,7 @@ package com.skilluser.user.controller;
 
 import com.skilluser.user.dto.UserDto;
 import com.skilluser.user.model.User;
+import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -14,9 +15,11 @@ public class UserController {
 
     public final UserService userService;
     public final ModelMapper modelMapper;
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    private final OtpService otpService;
+    public UserController(UserService userService, ModelMapper modelMapper, OtpService otpService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.otpService = otpService;
     }
 
 
@@ -41,6 +44,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+<<<<<<< HEAD
 
     @GetMapping("/getUsername")
     public User getUserByName(@RequestParam String username)
@@ -50,5 +54,22 @@ public class UserController {
     }
 
 
+=======
+    @PostMapping("/email")
+    public ResponseEntity<String> sendVerificationEmail(
+            @RequestParam("toEmail") String toEmail,
+            @RequestParam("subject") String subject,
+            @RequestParam("content") String content) {
+        try {
+            // Call the service to send the email
+            otpService.sendVerificationEmail(toEmail, subject, content);
+            return ResponseEntity.ok("Verification email sent successfully to " + toEmail);
+        } catch (Exception e) {
+            // Handle error and return appropriate response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send verification email: " + e.getMessage());
+        }
+    }
+>>>>>>> main
 
 }

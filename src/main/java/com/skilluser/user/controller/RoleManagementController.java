@@ -1,5 +1,6 @@
 package com.skilluser.user.controller;
 
+import com.skilluser.user.dto.ModulePermissionBulkDTO;
 import com.skilluser.user.dto.ModulePermissionDTO;
 import com.skilluser.user.dto.ModulePermissionGet;
 import com.skilluser.user.model.Module;
@@ -10,6 +11,7 @@ import com.skilluser.user.service.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +28,17 @@ public class RoleManagementController {
         this.moduleService = moduleService;
     }
 
-    @PostMapping
-    public Role createRole(@RequestBody Role role){
-        return roleService.createRole(role);
+    @PostMapping  // add role   shrunkhal 08/sep
+    public ResponseEntity<?> createRole(@RequestBody Role role) {
+        try {
+            Role savedRole = roleService.createRole(role);
+            return ResponseEntity.ok(savedRole);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
-
     @GetMapping("/role/{name}")
     public Role findRole(@PathVariable String name){
         return roleService.findByName(name);
@@ -43,10 +51,10 @@ public class RoleManagementController {
     }
 
     @PostMapping("/role/permissions")
-    public ResponseEntity<?> assignModulePermissions(@RequestBody ModulePermissionDTO request) {
+    public ResponseEntity<?> assignModulePermissions(@RequestBody ModulePermissionBulkDTO request) {
         try {
             return ResponseEntity.status(200).body(Map.of(
-                    "data",moduleService.addModulePermission(request),"msg","Permission give successfully"));
+                    "data",moduleService.addModulePermissions(request),"msg","Permission give successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(500).body(Map.of("msg",e.getMessage()));
         }
