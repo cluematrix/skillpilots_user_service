@@ -6,6 +6,8 @@ import com.skilluser.user.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class RoleServiceImpl implements RoleService {
@@ -18,6 +20,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role createRole(Role role) {
+        // Check if role already exists with same name + serviceType
+        Optional<Role> existing = roleRepository.findByNameAndServiceType(role.getName(), role.getServiceType());
+        if (existing.isPresent()) {
+            throw new IllegalArgumentException("Role '" + role.getName() + "' already exists for serviceType: " + role.getServiceType());
+        }
+
+        role.setActive(true);
         return roleRepository.save(role);
     }
 

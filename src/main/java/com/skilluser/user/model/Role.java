@@ -1,5 +1,6 @@
 package com.skilluser.user.model;
 
+import com.skilluser.user.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,7 +16,8 @@ public class Role {
     private Long id;
     private String name;
     private String createdAt;
-    private boolean isActive;
+    private ServiceType serviceType;
+    private boolean isActive=true;
     @PrePersist
     public void createdAt(){
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

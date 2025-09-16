@@ -1,5 +1,6 @@
 package com.skilluser.user.serviceImpl;
 
+import com.skilluser.user.dto.ModulePermissionBulkDTO;
 import com.skilluser.user.dto.ModulePermissionDTO;
 import com.skilluser.user.dto.ModulePermissionGet;
 import com.skilluser.user.model.Module;
@@ -12,7 +13,6 @@ import com.skilluser.user.repository.RoleRepository;
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.ModuleService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,29 +35,46 @@ public class ModuleServiceImpl implements ModuleService {
         return null;// modulePermissionRepository.findByName(name);
     }
 
-    @Override
-    public ModulePermission addModulePermission(ModulePermissionDTO request) {
+    public List<ModulePermissionDTO> addModulePermissions(ModulePermissionBulkDTO request) {
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        Module module = moduleRepository.findById(request.getModuleId())
-                .orElseThrow(() -> new RuntimeException("Module not found"));
+        List<ModulePermissionDTO> savedPermissions = new ArrayList<>();
 
-        // Check if permission already exists
-        // Check if permission already exists
-        ModulePermission permission = modulePermissionRepository
-                .findByRoleIdAndModuleId(role.getId(), module.getId())
-                .orElse(new ModulePermission());
+        for (ModulePermissionDTO dto : request.getPermissions()) {
+            Module module = moduleRepository.findById(dto.getModuleId())
+                    .orElseThrow(() -> new RuntimeException("Module not found"));
 
-        permission.setRole(role);
-        permission.setModule(module);
-        permission.setCanView(request.isCanView());
-        permission.setCanAdd(request.isCanAdd());
-        permission.setCanEdit(request.isCanEdit());
-        permission.setCanDelete(request.isCanDelete());
+            // Check if permission already exists
+            ModulePermission permission = modulePermissionRepository
+                    .findByRoleIdAndModuleId(role.getId(), module.getId())
+                    .orElse(new ModulePermission());
 
-     return    modulePermissionRepository.save(permission);
+            permission.setRole(role);
+            permission.setModule(module);
+            permission.setCanView(dto.isCanView());
+            permission.setCanAdd(dto.isCanAdd());
+            permission.setCanEdit(dto.isCanEdit());
+            permission.setCanDelete(dto.isCanDelete());
 
+         ModulePermission modulePermission= modulePermissionRepository.save(permission);
+            ModulePermissionDTO modulePermissionDTO = getModulePermissionDTO(modulePermission);
+            savedPermissions.add(modulePermissionDTO);
+        }
+
+        return savedPermissions;
+    }
+
+    private static ModulePermissionDTO getModulePermissionDTO(ModulePermission modulePermission) {
+        ModulePermissionDTO modulePermissionDTO= new ModulePermissionDTO();
+        modulePermissionDTO.setModuleId(modulePermission.getModule().getId());
+        modulePermissionDTO.setServiceType(modulePermission.getModule().getServiceType());
+        modulePermissionDTO.setRoleId(modulePermission.getRole().getId());
+        modulePermissionDTO.setCanEdit(modulePermission.isCanEdit());
+        modulePermissionDTO.setCanAdd(modulePermission.isCanAdd());
+        modulePermissionDTO.setCanView(modulePermission.isCanView());
+        modulePermissionDTO.setCanDelete(modulePermission.isCanDelete());
+        return modulePermissionDTO;
     }
 
     @Override
