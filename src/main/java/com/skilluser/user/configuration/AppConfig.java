@@ -38,8 +38,13 @@ public class AppConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/colleges/**").hasRole("COLLEGE")
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/v1/students/register",
+                                "/api/v1/students/setPassword", "/api/v1/students/resendOtp").permitAll()
+                        .requestMatchers("/api/v1/users/**").permitAll()
+                        .requestMatchers("/api/v1/colleges/**").hasAuthority("COLLEGE")   // 👈 changed
+                        .requestMatchers("/api/v1/students/**").hasAuthority("INT_STUDENT") // 👈 changed
+                        .requestMatchers("/api/v1/companies/**").hasAuthority("COMPANY")  // 👈 changed
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -70,18 +75,18 @@ public class AppConfig {
         return daoAuthenticationProvider;
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-@Bean
-public PasswordEncoder passwordEncoder() {
-    Map<String, PasswordEncoder> encoders = new HashMap<>();
-    encoders.put("bcrypt", new BCryptPasswordEncoder());
-    encoders.put("plain", NoOpPasswordEncoder.getInstance());
-
-    return new DelegatingPasswordEncoder("bcrypt", encoders);
-}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+//@Bean
+//public PasswordEncoder passwordEncoder() {
+//    Map<String, PasswordEncoder> encoders = new HashMap<>();
+//    encoders.put("bcrypt", new BCryptPasswordEncoder());
+//    encoders.put("plain", NoOpPasswordEncoder.getInstance());
+//
+//    return new DelegatingPasswordEncoder("bcrypt", encoders);
+//}
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
