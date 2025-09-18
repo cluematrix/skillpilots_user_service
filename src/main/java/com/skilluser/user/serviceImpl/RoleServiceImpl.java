@@ -34,4 +34,22 @@ public class RoleServiceImpl implements RoleService {
     public Role findByName(String name) {
         return roleRepository.findByName(name);
     }
+
+    @Override
+    public Role updateRole(Long id, Role updatedRole) {
+       return roleRepository.findById(id).map(existingRole-> {
+           existingRole.setName(updatedRole.getName());
+           existingRole.setServiceType(updatedRole.getServiceType());
+           existingRole.setActive(updatedRole.isActive());
+         return   roleRepository.save(existingRole);
+
+       }).orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
+    }
+
+
+    @Override
+    public void deleteRole(Long id) {
+        roleRepository.findById(id)
+                .ifPresent(role -> roleRepository.deleteById(id));
+    }
 }

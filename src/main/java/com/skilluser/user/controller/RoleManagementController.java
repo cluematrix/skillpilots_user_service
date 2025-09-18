@@ -8,6 +8,7 @@ import com.skilluser.user.model.ModulePermission;
 import com.skilluser.user.model.Role;
 import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.RoleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,5 +77,21 @@ public class RoleManagementController {
         return ResponseEntity.ok(modulePermission);
     }
 
+    @DeleteMapping("role/delete/{id}")
+    public ResponseEntity<String> deleteRole(@PathVariable Long id) {
+        try {
+            roleService.deleteRole(id);
+            return ResponseEntity.ok("Role deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Role not found with id: " + id);
+        }
+    }
+
+    @PutMapping("/role/{id}")
+    public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role updatedRole) {
+        Role role = roleService.updateRole(id, updatedRole);
+        return ResponseEntity.ok(role);
+    }
 
 }

@@ -2,6 +2,9 @@ package com.skilluser.user.controller;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
@@ -44,12 +47,14 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        HashMap<Object, Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 
         try {
             // Load user by email
             User user = userRepository.findByEmail(loginRequest.getEmail());
-
+            if (user == null) {
+                throw new BadCredentialsException("User not found");
+            }
 
             String rawPassword = loginRequest.getPassword();
             String storedPassword = user.getPassword(); // could be hashed or plain
@@ -64,22 +69,25 @@ public class LoginController {
             else if (storedPassword != null && storedPassword.equals(rawPassword)) {
                 isAuthenticated = true;
 
-
+                // Upgrade plain-text password to hashed password
                 String newHashed = passwordEncoder.encode(rawPassword);
                 user.setPassword(newHashed);
-               // userRepository.save(user);
+                userRepository.save(user);
             }
 
             if (!isAuthenticated) {
                 throw new BadCredentialsException("Invalid credentials");
             }
-
-            // Build authentication object manually since we skipped authenticationManager
+            List<String> roles = user.getAuthorities().stream()
+                    .map(gr -> gr.getAuthority()) // ROLE_COMPANY, ROLE_COLLEGE, etc.
+                    .collect(Collectors.toList());
+            // Manually set authentication
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String jwtToken = jwtUtils.generateToken(user);
+            // ✅ Fix: Pass username (or userDetails) to jwtUtils
+            String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(),roles);
 
             // set token into the cookie
             ResponseCookie cookie = ResponseCookie.from("jwt",jwtToken)
@@ -97,7 +105,8 @@ public class LoginController {
                     .body(response);
 
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid username or password"));
         }
     }
 
