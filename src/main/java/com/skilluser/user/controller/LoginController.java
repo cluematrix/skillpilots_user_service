@@ -1,12 +1,15 @@
 package com.skilluser.user.controller;
 
+import java.time.Duration;
 import java.util.HashMap;
 
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -78,11 +81,20 @@ public class LoginController {
 
             String jwtToken = jwtUtils.generateToken(user);
 
+            // set token into the cookie
+            ResponseCookie cookie = ResponseCookie.from("jwt",jwtToken)
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(Duration.ofDays(1))
+                    .sameSite("Strick")
+                    .build();
+
             response.put("token", jwtToken);
             response.put("user", user);
             response.put("authority", user.getAuthorities());
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(response);
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
