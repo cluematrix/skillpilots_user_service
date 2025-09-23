@@ -24,11 +24,13 @@ public class JwtUtil {
     }
 
     //  Generate token with roles
-    public String generateToken(Long userId, String username, List<String> roles) {
+    public String generateToken(Long userId, String email, List<String> roles,String username, Long contactNo) {
         return Jwts.builder()
-                .setSubject(username)      // optional
+                .claim("email",email)      // optional
                 .claim("userId", userId)   // important!
                 .claim("roles", roles)
+                .claim("username",username)
+                .claim("contact_no",contactNo)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -75,8 +77,18 @@ public class JwtUtil {
             return false;
         }
     }
+    public boolean isValidToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-
+    public Claims decodeToken(String token) {
+        return Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
