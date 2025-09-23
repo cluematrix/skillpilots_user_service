@@ -23,7 +23,8 @@ public class OtpServiceImpl implements OtpService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public Otp generateOtp(User user) {
+    public Otp generateOtp(User user)
+    {
         // Generate a 6-digit OTP
         String otpValue = String.format("%06d", new Random().nextInt(999999));
 
@@ -35,15 +36,18 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
-    public boolean validateOtp(User user, String inputOtp) {
+    public boolean validateOtp(User user, String inputOtp)
+    {
         Optional<Otp> latestOtp = otpRepository.findTopByUserOrderByExpirationTimeDesc(user);
 
         return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);
     }
 
     @Override
-    public void sendVerificationEmail(String toEmail, String subject, String content) {
-        try {
+    public void sendVerificationEmail(String toEmail, String subject, String content)
+    {
+        try
+        {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(toEmail);
@@ -53,7 +57,9 @@ public class OtpServiceImpl implements OtpService {
 
             helper.setText(emailContent, true);
             javaMailSender.send(message);
-        } catch (MessagingException e) {
+        }
+        catch (MessagingException e)
+        {
             e.printStackTrace();
         }
     }

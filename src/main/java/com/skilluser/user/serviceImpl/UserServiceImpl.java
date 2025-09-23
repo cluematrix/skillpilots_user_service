@@ -40,20 +40,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean changePassword(String email, String oldPassword, String newPassword) {
+    public boolean changePassword(String email, String oldPassword, String newPassword)
+    {
         User user = userRepository.findByEmail(email);
-        if (user == null) {
+        if (user == null)
+        {
             return false;
         }
 
         boolean passwordMatches = passwordEncoder.matches(oldPassword, user.getPassword());
-        if (!passwordMatches) {
+        if (!passwordMatches)
+        {
             return false;
         }
-
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPlainPassword(newPassword);
         userRepository.save(user);
         return true;
     }
-
 }
