@@ -120,5 +120,9 @@ public class User implements UserDetails {
     public String getUsername() {
         return email;
     }
+
+    public String getName(){
+        return username;
+    }
 }
 

@@ -91,4 +91,23 @@ public class UserController {
                     .body(Map.of("message", "Invalid email or old password"));
         }
     }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email)
+    {
+        try
+        {
+            User user = userService.forgotPassword(email);
+            return ResponseEntity.ok(Map.of("message", "Temporary password sent to your email", "email", user.getEmail()));
+
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+
 }
