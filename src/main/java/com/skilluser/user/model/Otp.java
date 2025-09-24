@@ -30,6 +30,10 @@ public class Otp {
         this.expirationTime = expirationTime;
 
     }
+
+    public Otp(String otpValue, LocalDateTime expiry, User user) {
+    }
+
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expirationTime);
     }
