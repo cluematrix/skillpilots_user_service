@@ -8,5 +8,8 @@ import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<Otp,Long> {
 
+
   public Optional<Otp> findTopByUserOrderByExpirationTimeDesc(User  user);
+
+
 }

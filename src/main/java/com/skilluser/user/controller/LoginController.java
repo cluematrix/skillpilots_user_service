@@ -1,5 +1,6 @@
 package com.skilluser.user.controller;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,17 @@ public class LoginController {
             // Generate JWT token
             String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(), roles, user.getName(),user.getContact_no());
 
+
+            // set token into the cookie
+        /*    ResponseCookie cookie = ResponseCookie.from("jwt",jwtToken)
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(Duration.ofDays(1))
+                    .sameSite("Strick")
+                    .build();
+
+            response.put("token", jwtToken);*/
+
 //            // Create secure HttpOnly cookie
 //            ResponseCookie cookie = ResponseCookie.from("auth_token", jwtToken)
 //                    .httpOnly(true)        // prevent JS access
@@ -105,9 +117,13 @@ public class LoginController {
 //            httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 //            response.put("cooki")
             // Also return user details in JSON
+
             response.put("user", user);
             response.put("authority", roles);
             response.put("token",jwtToken);
+
+
+
 
             return ResponseEntity.ok()
 

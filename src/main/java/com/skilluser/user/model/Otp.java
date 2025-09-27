@@ -21,16 +21,28 @@ public class Otp {
 
     private boolean used = false;
 
+<<<<<<< HEAD
 
+=======
+    private String email;
+>>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
 
     public Otp() {}
 
     public Otp(String otp, LocalDateTime expirationTime) {
         this.otp = otp;
         this.expirationTime = expirationTime;
+<<<<<<< HEAD
     }
 
 
+=======
+
+    }
+
+    public Otp(String otpValue, LocalDateTime expiry, User user) {
+    }
+>>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expirationTime);

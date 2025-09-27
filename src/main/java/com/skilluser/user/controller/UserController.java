@@ -1,5 +1,6 @@
 package com.skilluser.user.controller;
 
+import com.skilluser.user.dto.ChangePasswordRequest;
 import com.skilluser.user.dto.UserDto;
 import com.skilluser.user.model.Role;
 import com.skilluser.user.model.User;
@@ -12,7 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+<<<<<<< HEAD
 import java.util.List;
+=======
+import java.util.Map;
+>>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -30,7 +35,7 @@ public class UserController {
     }
 
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserDto> getByUserId(@PathVariable Long id) {
         try {
             User user = userService.getUserById(id);
@@ -51,6 +56,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+    @GetMapping("/getUsername")
+    public User getUserByName(@RequestParam String username)
+    {
+        User byUsername = userService.findByUsername(username);
+        return byUsername;
+    }
+
+
     @PostMapping("/email")
     public ResponseEntity<String> sendVerificationEmail(
             @RequestParam("toEmail") String toEmail,
@@ -67,6 +82,7 @@ public class UserController {
         }
     }
 
+<<<<<<< HEAD
     @GetMapping("/byRoleAndDepartment")
     public ResponseEntity<List<UserDto>> findUsersByRoleAndDepartment(
             @RequestParam("roleId") Long roleId,
@@ -131,6 +147,41 @@ public class UserController {
         }).toList();
 
         return ResponseEntity.ok(dtos);
+=======
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request)
+    {
+        boolean changed = userService.changePassword(request.getEmail(),
+                request.getOldPassword(),
+                request.getNewPassword());
+
+        if (changed)
+        {
+            return ResponseEntity.ok(Map.of("message", "Password Changed Successfully!"));
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Invalid email or old password"));
+        }
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email)
+    {
+        try
+        {
+            User user = userService.forgotPassword(email);
+            return ResponseEntity.ok(Map.of("message", "Temporary password sent to your email", "email", user.getEmail()));
+
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
+>>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
     }
 
 

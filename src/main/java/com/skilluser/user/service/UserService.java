@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface UserService {
  public User getUserById(Long id);
+<<<<<<< HEAD
 
     List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId);
 
@@ -13,5 +14,10 @@ public interface UserService {
 
     List<User> findHodByDepartment(Long roleId, Long departmentId);
 
+=======
+ public User findByUsername(String username);
+ public boolean changePassword(String email, String oldPassword, String newPassword);
+ public User forgotPassword(String email);
+>>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
 
 }
