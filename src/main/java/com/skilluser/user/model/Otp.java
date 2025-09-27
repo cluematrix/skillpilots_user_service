@@ -21,17 +21,17 @@ public class Otp {
 
     private boolean used = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+
 
     public Otp() {}
 
-    public Otp(String otp, LocalDateTime expirationTime, User user) {
+    public Otp(String otp, LocalDateTime expirationTime) {
         this.otp = otp;
         this.expirationTime = expirationTime;
-        this.user = user;
     }
+
+
+
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expirationTime);
     }

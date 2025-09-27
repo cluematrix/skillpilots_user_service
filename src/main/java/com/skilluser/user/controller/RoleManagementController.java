@@ -6,8 +6,10 @@ import com.skilluser.user.dto.ModulePermissionGet;
 import com.skilluser.user.model.Module;
 import com.skilluser.user.model.ModulePermission;
 import com.skilluser.user.model.Role;
+import com.skilluser.user.repository.RoleRepository;
 import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.RoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ public class RoleManagementController {
 
     private final RoleService roleService;
     private final ModuleService moduleService;
+    @Autowired
+    private RoleRepository roleRepository;
 
     public RoleManagementController(RoleService roleService, ModuleService moduleService) {
         this.roleService = roleService;
@@ -93,5 +97,11 @@ public class RoleManagementController {
         Role role = roleService.updateRole(id, updatedRole);
         return ResponseEntity.ok(role);
     }
+//
+//    @GetMapping("/id/{id}")
+//    public Role findRoleById(@PathVariable("id") Long id){
+//        return roleRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Role not found for this id: "+id));
+//    }
 
 }

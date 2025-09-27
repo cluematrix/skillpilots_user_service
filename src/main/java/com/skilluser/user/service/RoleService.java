@@ -2,6 +2,8 @@ package com.skilluser.user.service;
 
 import com.skilluser.user.model.Role;
 
+import java.util.List;
+
 public interface RoleService {
 
     public Role createRole(Role role);
