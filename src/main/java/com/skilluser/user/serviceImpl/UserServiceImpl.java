@@ -1,14 +1,13 @@
 package com.skilluser.user.serviceImpl;
 
-<<<<<<< HEAD
 import com.skilluser.user.model.Role;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.RoleRepository;
-=======
-import com.skilluser.user.model.Otp;
+
+
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.OtpRepository;
->>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
+
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(()-> new UsernameNotFoundException("User Not Found "+ id));
     }
 
-<<<<<<< HEAD
+
 
     @Override
     public List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId) {
@@ -70,7 +69,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<User> findHodByDepartment(Long roleId, Long departmentId) {
         return userRepository.findHodByDepartment(roleId,departmentId);
     }
-=======
+
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
@@ -142,5 +141,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
 
->>>>>>> b45dd3c14b5f4290140d72ecae28211640eb0035
 }
