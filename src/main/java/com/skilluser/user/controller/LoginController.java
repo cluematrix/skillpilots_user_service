@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
+import com.skilluser.user.service.ModuleService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +46,8 @@ public class LoginController {
     private JwtUtil jwtUtils;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ModuleService moduleService;
 
 
     @PostMapping("/login")
@@ -89,41 +93,28 @@ public class LoginController {
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+
             // Generate JWT token
-            String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(), roles, user.getName(),user.getContact_no());
+            String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(), roles, user.getName(), user.getContact_no(), user.getCollegeId(), user.getCompanyId());
 
-
-            // set token into the cookie
-        /*    ResponseCookie cookie = ResponseCookie.from("jwt",jwtToken)
-                    .httpOnly(true)
-                    .path("/")
-                    .maxAge(Duration.ofDays(1))
-                    .sameSite("Strick")
-                    .build();
-
-            response.put("token", jwtToken);*/
-
-//            // Create secure HttpOnly cookie
-//            ResponseCookie cookie = ResponseCookie.from("auth_token", jwtToken)
-//                    .httpOnly(true)        // prevent JS access
-//                    .secure(false)         // set true in production (HTTPS)
-//                                // available for entire domain
-//                    .maxAge(24 * 60 * 60)  // 1 day
-//                    .sameSite("None")    // CSRF protection
-//                    .build();
-//
-//
-//            // Add cookie in response header
-//            httpResponse.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-//            response.put("cooki")
             // Also return user details in JSON
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setId(user.getId());
+            loginResponse.setCollegeId(user.getCollegeId());
+            loginResponse.setCompanyId(user.getCompanyId());
+            loginResponse.setEmail(user.getEmail());
+            loginResponse.setUsername(user.getName());
+            loginResponse.setUser_role(roles);
+            loginResponse.setDepartment(user.getDepartment());
+            loginResponse.setHodverified(user.getHodverified());
+            loginResponse.setContact_no(user.getContact_no());
 
-            response.put("user", user);
-            response.put("authority", roles);
-            response.put("token",jwtToken);
+            response.put("user", loginResponse);
 
-
-
+            response.put("token", jwtToken);
+            response.put("user_role", roles);
+            Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(user.getId());
+            response.put("permission",permissionsForUser);
 
             return ResponseEntity.ok()
 
@@ -148,6 +139,7 @@ public class LoginController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
+    // decode token shrunkhal 26/sept
     @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -179,10 +171,13 @@ public class LoginController {
 
         // Decode token
         Claims claims = jwtUtils.decodeToken(token);
-
+        Long userId = claims.get("userId",Long.class);
+        // fetch permission
+        Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
         return ResponseEntity.ok(Map.of(
                 "valid", true,
-                "user", claims
+                "user", claims,
+                "permission",permissionsForUser
         ));
     }
 

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -50,14 +51,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean changePassword(String email, String oldPassword, String newPassword)
+    public boolean changePassword(Long userId, String oldPassword, String newPassword)
     {
-        User user = userRepository.findByEmail(email);
-        if (user == null)
+        Optional<User> exist = userRepository.findById(userId);
+        if (exist.isEmpty())
         {
             return false;
         }
-
+      User user=  exist.get();
         boolean passwordMatches = passwordEncoder.matches(oldPassword, user.getPassword());
         if (!passwordMatches)
         {

@@ -9,5 +9,6 @@ public class UserDto {
     private String email;
     private String role;
     private int collegeId;
+    private Long contactNo;
 
 }

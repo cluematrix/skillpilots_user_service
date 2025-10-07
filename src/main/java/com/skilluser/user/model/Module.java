@@ -17,6 +17,7 @@ public class Module {
     private String name;
     private String createdAt;
     private String path;
+
     private ServiceType serviceType;
     private boolean isActive;
 
