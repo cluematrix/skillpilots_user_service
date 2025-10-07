@@ -24,13 +24,16 @@ public class JwtUtil {
     }
 
     //  Generate token with roles
-    public String generateToken(Long userId, String email, List<String> roles,String username, Long contactNo) {
+    public String generateToken(Long userId, String email, List<String> roles,String username, Long contactNo, int collegeId, Long companyId) {
         return Jwts.builder()
                 .claim("email",email)      // optional
                 .claim("userId", userId)   // important!
-                .claim("roles", roles)
-                .claim("username",username)
+                .claim("user_role", roles)
+                .claim("name",username)
+                .claim("collegeId", collegeId)
+                .claim("companyId",companyId)
                 .claim("contact_no",contactNo)
+
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -48,7 +51,7 @@ public class JwtUtil {
 
     // Extract roles
     public List<String> extractRoles(String token) {
-        return extractAllClaims(token).get("roles", List.class);
+        return extractAllClaims(token).get("user_role", List.class);
     }
 
     //  Check if token expired

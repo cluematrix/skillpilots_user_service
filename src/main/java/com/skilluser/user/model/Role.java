@@ -16,8 +16,12 @@ public class Role {
     private Long id;
     private String name;
     private String createdAt;
+
     private ServiceType serviceType;
+    private boolean defaultRole = false; // true for admin-created defaults
     private boolean isActive=true;
+    private Long collegeId;
+    private Long companyId;
     @PrePersist
     public void createdAt(){
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

@@ -3,11 +3,15 @@ package com.skilluser.user.controller;
 import com.skilluser.user.dto.ModulePermissionBulkDTO;
 import com.skilluser.user.dto.ModulePermissionDTO;
 import com.skilluser.user.dto.ModulePermissionGet;
+import com.skilluser.user.dto.PermissionSetRequest;
+import com.skilluser.user.model.CustomRole;
 import com.skilluser.user.model.Module;
 import com.skilluser.user.model.ModulePermission;
 import com.skilluser.user.model.Role;
+import com.skilluser.user.repository.RoleRepository;
 import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.RoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// shrunkhal 8/sept
 @RestController
 @RequestMapping("api/v1/users")
 public class RoleManagementController {
@@ -23,6 +28,8 @@ public class RoleManagementController {
 
     private final RoleService roleService;
     private final ModuleService moduleService;
+    @Autowired
+    private RoleRepository roleRepository;
 
     public RoleManagementController(RoleService roleService, ModuleService moduleService) {
         this.roleService = roleService;
@@ -40,30 +47,30 @@ public class RoleManagementController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-    @GetMapping("/role/{name}")
-    public Role findRole(@PathVariable String name){
+
+    @GetMapping("/role/{name}")   // get role   shrunkhal 08/sep
+    public Role findRole(@PathVariable String name) {
         return roleService.findByName(name);
     }
 
     @PostMapping("/role/model")
-    public Module createModule(@RequestBody Module module)
-    {
-        return  moduleService.createModule(module);
+    public Module createModule(@RequestBody Module module) {
+        return moduleService.createModule(module);
     }
 
-    @PostMapping("/role/permissions")
+    @PostMapping("/role/permissions") // get permission   shrunkhal 08/sep
     public ResponseEntity<?> assignModulePermissions(@RequestBody ModulePermissionBulkDTO request) {
         try {
             return ResponseEntity.status(200).body(Map.of(
-                    "data",moduleService.addModulePermissions(request),"msg","Permission give successfully"));
+                    "data", moduleService.addModulePermissions(request), "msg", "Permission give successfully"));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(500).body(Map.of("msg",e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("msg", e.getMessage()));
         }
 
     }
 
     @GetMapping("/role/permissions/{name}")
-    public ResponseEntity<?> getPermission(@PathVariable String name ){
+    public ResponseEntity<?> getPermission(@PathVariable String name) {
 
         ModulePermission byName = moduleService.findByName(name);
         return ResponseEntity.status(200).body(byName);
@@ -71,7 +78,7 @@ public class RoleManagementController {
 
     @GetMapping("/role/sidebar/{userId}")
     public ResponseEntity<?> getSidebar(@PathVariable Long userId) {
-        System.out.println("User"+ userId);
+        System.out.println("User" + userId);
         List<ModulePermissionGet> modulePermission = moduleService.getModulePermission(userId);
 
         return ResponseEntity.ok(modulePermission);
@@ -93,5 +100,52 @@ public class RoleManagementController {
         Role role = roleService.updateRole(id, updatedRole);
         return ResponseEntity.ok(role);
     }
+//
+//    @GetMapping("/id/{id}")
+//    public Role findRoleById(@PathVariable("id") Long id){
+//        return roleRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Role not found for this id: "+id));
+//    }
 
+    @PostMapping("/save")
+    public List<ModulePermission> saveOrUpdatePermissions(
+            @RequestParam Long roleId,
+            @RequestParam(required = false) Long collegeId,
+            @RequestParam(required = false) Long companyId,
+            @RequestBody List<ModulePermissionDTO> permissions) {
+
+        return moduleService.saveOrUpdatePermissions(roleId, collegeId, companyId, permissions);
+    }
+
+    @GetMapping("/permissions")
+    public List<ModulePermission> getPermissions(
+            @RequestParam Long roleId,
+            @RequestParam(required = false) Long collegeId,
+            @RequestParam(required = false) Long companyId) {
+
+        return moduleService.getPermissionsForRole(roleId, collegeId, companyId);
+    }
+
+    @PostMapping("/custom_role")
+    public ResponseEntity<?> createCustomRole(@RequestBody CustomRole customRole) {
+        return ResponseEntity.status(200).body(roleService.createCustomRole(customRole));
+    }
+
+    @PostMapping("/set")
+    public ResponseEntity<?> setPermissions(@RequestBody PermissionSetRequest request) {
+        moduleService.setPermissions(
+                request.getRoleId(),
+                request.getCollegeId(),
+                request.getCompanyId(),
+                request.getPermissions()
+        );
+        return ResponseEntity.ok("Permissions updated successfully!");
+    }
+
+    @GetMapping("/me/{userId}")
+    public ResponseEntity<?> getMyPermissions(@PathVariable Long userId) {
+
+        Map<String, Object> permissions = moduleService.getPermissionsForUser(userId);
+        return ResponseEntity.ok(permissions);
+    }
 }

@@ -61,6 +61,7 @@ public class User implements UserDetails {
 
     @ManyToOne
     private Role roles;
+    private Long companyId;
 
     private String role;
     private int verified;

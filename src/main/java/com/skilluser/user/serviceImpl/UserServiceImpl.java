@@ -1,8 +1,13 @@
 package com.skilluser.user.serviceImpl;
 
-import com.skilluser.user.model.Otp;
+import com.skilluser.user.model.Role;
+import com.skilluser.user.model.User;
+import com.skilluser.user.repository.RoleRepository;
+
+
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.OtpRepository;
+
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
@@ -12,8 +17,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -43,20 +53,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(()-> new UsernameNotFoundException("User Not Found "+ id));
     }
 
+
+
+    @Override
+    public List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId) {
+        return userRepository.findUsersByRoleAndDepartment(roleId,departmentId);
+    }
+
+    @Override
+    public List<User> findUsersByRoles_IdAndCollegeId(Long roleId, Long collegeId) {
+        return userRepository.findUsersByRoles_IdAndCollegeId(roleId,collegeId);
+    }
+
+    @Override
+    public List<User> findHodByDepartment(Long roleId, Long departmentId) {
+        return userRepository.findHodByDepartment(roleId,departmentId);
+    }
+
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     @Override
-    public boolean changePassword(String email, String oldPassword, String newPassword)
+    public boolean changePassword(Long userId, String oldPassword, String newPassword)
     {
-        User user = userRepository.findByEmail(email);
-        if (user == null)
+        Optional<User> exist = userRepository.findById(userId);
+        if (exist.isEmpty())
         {
             return false;
         }
-
+      User user=  exist.get();
         boolean passwordMatches = passwordEncoder.matches(oldPassword, user.getPassword());
         if (!passwordMatches)
         {

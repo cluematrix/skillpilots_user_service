@@ -23,6 +23,31 @@ public class OtpServiceImpl implements OtpService {
     private final OtpRepository otpRepository;
     private final JavaMailSender javaMailSender;
 
+
+
+//    @Override
+//    public Otp generateOtp(User user)
+//    {
+//        // Generate a 6-digit OTP
+//        String otpValue = String.format("%06d", new Random().nextInt(999999));
+//
+//        // Set expiry to 5 minutes from now
+//        LocalDateTime expiry = LocalDateTime.now().plusMinutes(5);
+//
+//        Otp otp = new Otp();
+//        otp.setOtp(otpValue);
+//
+//        return otpRepository.save(otp);
+//    }
+
+//    @Override
+//    public boolean validateOtp(User user, String inputOtp)
+//    {
+//        Optional<Otp> latestOtp = otpRepository.findTopByUserOrderByExpirationTimeDesc(user);
+//
+//        return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);
+//    }
+
     @Override
     public Otp generateOtp(User user)
     {
@@ -46,6 +71,13 @@ public class OtpServiceImpl implements OtpService {
         return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);*/
         return false;
     }
+    /*@Override
+    public boolean validateOtp(User user, String inputOtp)
+    {
+        Optional<Otp> latestOtp = otpRepository.findTopByUserOrderByExpirationTimeDesc(user);
+
+        return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);
+    }*/
 
     @Override
     public void sendVerificationEmail(String toEmail, String subject, String content)
