@@ -1,8 +1,13 @@
 package com.skilluser.user.serviceImpl;
 
-import com.skilluser.user.model.Otp;
+import com.skilluser.user.model.Role;
+import com.skilluser.user.model.User;
+import com.skilluser.user.repository.RoleRepository;
+
+
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.OtpRepository;
+
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
@@ -12,6 +17,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -43,6 +52,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(()-> new UsernameNotFoundException("User Not Found "+ id));
+    }
+
+
+
+    @Override
+    public List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId) {
+        return userRepository.findUsersByRoleAndDepartment(roleId,departmentId);
+    }
+
+    @Override
+    public List<User> findUsersByRoles_IdAndCollegeId(Long roleId, Long collegeId) {
+        return userRepository.findUsersByRoles_IdAndCollegeId(roleId,collegeId);
+    }
+
+    @Override
+    public List<User> findHodByDepartment(Long roleId, Long departmentId) {
+        return userRepository.findHodByDepartment(roleId,departmentId);
     }
 
     @Override
