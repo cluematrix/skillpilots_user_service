@@ -10,16 +10,11 @@ public class UserApplication {
 	public static void main(String[] args) {
 
 
-//		Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load(); // loads .env into System env
-//
-//		System.out.println("===== Loaded .env entries =====");
-//		dotenv.entries().forEach(e -> {
-//			System.out.println(e.getKey() + " = " + e.getValue());
-//		});
-//		System.out.println("================================");
-//
-//		// Inject into JVM system properties
-//		dotenv.entries().forEach(e -> System.setProperty(e.getKey(), e.getValue()));
+		Dotenv dotenv = Dotenv.load(); // loads .env file automatically
+
+		System.setProperty("DB_URL", dotenv.get("DB_URL"));
+		System.setProperty("DB_USER", dotenv.get("DB_USER"));
+		System.setProperty("DB_PASS", dotenv.get("DB_PASS"));
 
 
 		SpringApplication.run(UserApplication.class, args);
