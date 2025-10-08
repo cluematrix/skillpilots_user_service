@@ -18,5 +18,7 @@ public interface UserService {
  public boolean changePassword(Long userId, String oldPassword, String newPassword);
  public User forgotPassword(String email);
 
+ public User getAllDataByUserId(Long userId);
+
 
 }

@@ -133,6 +133,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user; // just return user, don’t save otp inside user
     }
 
+    @Override
+    public User getAllDataByUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    }
+
+
 
     public String generateOTP()
     {

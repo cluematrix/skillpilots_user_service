@@ -99,7 +99,7 @@ public class LoginController {
 
             // Also return user details in JSON
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setId(user.getId());
+            loginResponse.setUserId(user.getId());
             loginResponse.setCollegeId(user.getCollegeId());
             loginResponse.setCompanyId(user.getCompanyId());
             loginResponse.setEmail(user.getEmail());

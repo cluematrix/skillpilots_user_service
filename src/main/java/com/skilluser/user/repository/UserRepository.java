@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query("SELECT u FROM User u WHERE u.roles.id = :roleId AND u.department = :departmentId")
     List<User> findHodByDepartment(Long roleId, Long departmentId);
     User findByUsername(String username);
+
+
 }
