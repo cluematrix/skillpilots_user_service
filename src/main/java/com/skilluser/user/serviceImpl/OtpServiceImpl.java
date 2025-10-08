@@ -24,6 +24,7 @@ public class OtpServiceImpl implements OtpService {
     private final JavaMailSender javaMailSender;
 
 
+
 //    @Override
 //    public Otp generateOtp(User user)
 //    {
@@ -62,6 +63,14 @@ public class OtpServiceImpl implements OtpService {
         return otpRepository.save(otp);
     }
 
+    @Override
+    public boolean validateOtp(User user, String inputOtp)
+    {
+       /* Optional<Otp> latestOtp = otpRepository.findTopByUserOrderByExpirationTimeDesc(user);
+
+        return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);*/
+        return false;
+    }
     /*@Override
     public boolean validateOtp(User user, String inputOtp)
     {
