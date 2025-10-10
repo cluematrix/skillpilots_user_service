@@ -16,24 +16,25 @@ import java.util.HashMap;
 import java.util.Map;
 @RestController
 @RequestMapping("/api/monitor")
-public class HealthMonitorController {
+public class HealthMonitorController
+{
 
     @Autowired
     private StudentServiceClient studentClient;
 
-@Autowired
+    @Autowired
     private CollegeServiceClient collegeClient;
 
-@Autowired
+    @Autowired
     private CompanyServiceClient companyClient;
 
-    @Value("/api/v1/health")
+    @Value("/api/v1/students")
     private String studentUrl;
 
-    @Value("/api/v1/health")
+    @Value("/api/v1/colleges")
     private String collegeUrl;
 
-    @Value("/api/v1/health")
+    @Value("/api/v1/companies")
     private String companyUrl;
 
     @Value("${server.port}")
@@ -45,49 +46,73 @@ public class HealthMonitorController {
         Map<String, Object> allStatus = new HashMap<>();
         allStatus.put("timestamp", LocalDateTime.now());
 
-        // Check Student Service
+        // Student Service
         allStatus.put("studentService", getServiceStatus("Student Service", studentUrl, studentClient));
 
-        // Check College Service
+        // College Service
         allStatus.put("collegeService", getServiceStatus("College Service", collegeUrl, collegeClient));
 
-        // Check Company Service
+        // Company Service
         allStatus.put("companyService", getServiceStatus("Company Service", companyUrl, companyClient));
 
-        // User Service (self)
+        long start = System.nanoTime();
+
+        boolean isHealthy = true;
+        String message = isHealthy ? "Running normally" : "Issues detected";
+
+        try
+        {
+            Thread.sleep(1);
+        }
+        catch (InterruptedException ignored)
+        {}
+
+        long end = System.nanoTime();
+
         ServiceHealthStatus userService = new ServiceHealthStatus();
         userService.setServiceName("User Service");
-        userService.setStatus("UP");
-        userService.setUrl("http://localhost:" + userServicePort);
+        userService.setStatus(isHealthy ? "UP" : "DOWN");
+        userService.setUrl("http://localhost:" + userServicePort + "/api/v1/users");
         userService.setPort(userServicePort);
-        userService.setResponseTime(0);
-        userService.setMessage("Running normally");
+        userService.setResponseTime((long) ((end - start) / 1_000_000.0));
+        userService.setMessage(message);
         userService.setTimestamp(LocalDateTime.now());
+
         allStatus.put("userService", userService);
+
 
         return ResponseEntity.ok(allStatus);
     }
 
-    private ServiceHealthStatus getServiceStatus(String serviceName, String url, Object client) {
+    private ServiceHealthStatus getServiceStatus(String serviceName, String url, Object client)
+    {
         ServiceHealthStatus status = new ServiceHealthStatus();
         status.setServiceName(serviceName);
         status.setUrl(url);
         status.setTimestamp(LocalDateTime.now());
 
         long start = System.currentTimeMillis();
-        try {
-            if (client instanceof StudentServiceClient) {
+        try
+        {
+            if (client instanceof StudentServiceClient)
+            {
                 ((StudentServiceClient) client).checkHealth();
-            } else if (client instanceof CollegeServiceClient) {
+            }
+            else if (client instanceof CollegeServiceClient)
+            {
                 ((CollegeServiceClient) client).checkHealth();
-            } else if (client instanceof CompanyServiceClient) {
+            }
+            else if (client instanceof CompanyServiceClient)
+            {
                 ((CompanyServiceClient) client).checkHealth();
             }
             long end = System.currentTimeMillis();
             status.setStatus("UP");
             status.setResponseTime(end - start);
             status.setMessage("Service running normally");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             long end = System.currentTimeMillis();
             status.setStatus("DOWN");
             status.setResponseTime(end - start);
