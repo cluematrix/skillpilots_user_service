@@ -108,7 +108,7 @@ public class LoginController {
             loginResponse.setDepartment(user.getDepartment());
             loginResponse.setHodverified(user.getHodverified());
             loginResponse.setContact_no(user.getContact_no());
-
+            loginResponse.setPhoto(user.getPhoto());
             response.put("user", loginResponse);
 
             response.put("token", jwtToken);
