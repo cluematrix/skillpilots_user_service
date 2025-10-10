@@ -92,7 +92,6 @@ public class ChatController {
     }
 
 
-
     // Typing indicator
     @MessageMapping("/typing")
     public void typing(@Payload LiveChatMessage message) {
@@ -111,7 +110,7 @@ public class ChatController {
         String privateRoom = "private-" + Arrays.asList(message.getSenderId(), message.getReceiverId())
                 .stream().sorted().collect(Collectors.joining("-"));
 
-        chatMemory.addMessage(privateRoom,message);
+        chatMemory.addMessage(privateRoom, message);
 
         messagingTemplate.convertAndSend("/topic/" + privateRoom, message);
     }
@@ -119,27 +118,23 @@ public class ChatController {
 
     // delivered messege
     @MessageMapping("/delivered")
-    public void delivered(@Payload LiveChatMessage message)
-    {
+    public void delivered(@Payload LiveChatMessage message) {
         message.setStatus(MessageStatus.DELIVERED);
-        chatMemory.updateMessageStatus(message.getId(),MessageStatus.DELIVERED);
-        messagingTemplate.convertAndSend("/topic/"+message.getRoomId(),message);
+        chatMemory.updateMessageStatus(message.getId(), MessageStatus.DELIVERED);
+        messagingTemplate.convertAndSend("/topic/" + message.getRoomId(), message);
     }
 
 
-
     @MessageMapping("/seen")
-    public void seen(@Payload LiveChatMessage message)
-    {
+    public void seen(@Payload LiveChatMessage message) {
         message.setStatus(MessageStatus.SEEN);
-        chatMemory.updateMessageStatus(message.getId(),MessageStatus.SEEN);
-        messagingTemplate.convertAndSend("/topic/"+message.getRoomId(),message);
+        chatMemory.updateMessageStatus(message.getId(), MessageStatus.SEEN);
+        messagingTemplate.convertAndSend("/topic/" + message.getRoomId(), message);
     }
 
 
     @MessageMapping("/reaction")
-    public void addReaction(@Payload Map<String,String> reactionData)
-    {
+    public void addReaction(@Payload Map<String, String> reactionData) {
         String messageId = reactionData.get("messageId");
         String userId = reactionData.get("userId");
         String reaction = reactionData.get("reaction");
@@ -147,30 +142,28 @@ public class ChatController {
         LiveChatMessage reactionMsg = new LiveChatMessage();
         reactionMsg.setId(UUID.randomUUID().toString());
         reactionMsg.setSenderId(userId);
-        reactionMsg.setContent("Reacted with : "+reaction);
+        reactionMsg.setContent("Reacted with : " + reaction);
         reactionMsg.setType(MessageType.EMOJI);
         reactionMsg.setCreatedAt(LocalDateTime.now());
         reactionMsg.setStatus(MessageStatus.SENT);
 
-        messagingTemplate.convertAndSend("/topic/"+reactionData.get("roomId"),reactionMsg);
+        messagingTemplate.convertAndSend("/topic/" + reactionData.get("roomId"), reactionMsg);
     }
 
 
-
     @MessageMapping("/mediaMessage")
-    public void mediaMessage(@Payload LiveChatMessage message,MessageStatus status)
-    {
-        if(message.getId()==null){
+    public void mediaMessage(@Payload LiveChatMessage message, MessageStatus status) {
+        if (message.getId() == null) {
             message.setId(UUID.randomUUID().toString());
             message.setCreatedAt(LocalDateTime.now());
             message.setStatus(status);
 
-            if(message.getType()==null){
+            if (message.getType() == null) {
                 message.setType(MessageType.FILE);
             }
 
-            chatMemory.addMessage(message.getRoomId(),message);
-            messagingTemplate.convertAndSend("/topic/"+message.getRoomId(),message);
+            chatMemory.addMessage(message.getRoomId(), message);
+            messagingTemplate.convertAndSend("/topic/" + message.getRoomId(), message);
         }
     }
 

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 import java.util.Map;
@@ -59,6 +60,31 @@ public class UserController {
         return dto;
 
     }
+
+    // Ajay - 07-10-2025 - All data fetch by user id
+    @GetMapping("/allUsers/{userId}")
+    public ResponseEntity<?> getAllByUserId(@PathVariable Long userId)
+    {
+        try
+        {
+            User allUsers = userService.getAllDataByUserId(userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User retrieved successfully!!!");
+            response.put("data", allUsers);
+
+            return ResponseEntity.ok(response);
+        }
+        catch (Exception e)
+        {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Error retrieving user data");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
 
     @GetMapping("/getUsername")
     public User getUserByName(@RequestParam String username) {

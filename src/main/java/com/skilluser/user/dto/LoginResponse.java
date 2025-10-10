@@ -6,7 +6,7 @@ import java.util.List;
 @Data
 public class LoginResponse {
 
-    private Long id;
+    private Long userId;
     private String username;
     private String email;
     private Long department;
