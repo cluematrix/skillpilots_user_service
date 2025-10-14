@@ -15,13 +15,15 @@ public class DomainController
     // shrunkhal 9-10-25  add domain
     private final DomainService domainService;
     @PostMapping
-    public ResponseEntity<?> createDomain(@RequestBody Domain domain){
-        return ResponseEntity.status(HttpStatus.OK).body(domainService.createDomain(domain));
+    public ResponseEntity<Domain> createDomain(@RequestBody Domain domain)
+    {
+        Domain savedDomain = domainService.createDomain(domain);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedDomain);
     }
 
     @GetMapping    // shrunkhal 9-10-25 get domain
-    public ResponseEntity<?> getDomains(){
+    public ResponseEntity<?> getDomains()
+    {
         return ResponseEntity.status(HttpStatus.OK).body(domainService.getDomains());
-
     }
 }
