@@ -95,7 +95,7 @@ public class LoginController {
 
 
             // Generate JWT token
-            String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(), roles, user.getName(), user.getContact_no(), user.getCollegeId(), user.getCompanyId());
+            String jwtToken = jwtUtils.generateToken(user.getId(), user.getEmail(), roles, user.getName(), user.getContact_no(), user.getCollegeId(), user.getCompanyId(), user.getDepartment());
 
             // Also return user details in JSON
             LoginResponse loginResponse = new LoginResponse();
@@ -172,12 +172,16 @@ public class LoginController {
         // Decode token
         Claims claims = jwtUtils.decodeToken(token);
         Long userId = claims.get("userId",Long.class);
+        claims.get("deptId", Long.class);
+
+        String username = userRepository.findById(userId).map(User::getName).get();
         // fetch permission
         Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
         return ResponseEntity.ok(Map.of(
                 "valid", true,
                 "user", claims,
-                "permission",permissionsForUser
+                "permission",permissionsForUser,
+                "name",username
         ));
     }
 

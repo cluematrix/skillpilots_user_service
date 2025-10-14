@@ -116,7 +116,7 @@ public class ChatController {
     }
 
 
-    // delivered messege
+    // delivered message
     @MessageMapping("/delivered")
     public void delivered(@Payload LiveChatMessage message) {
         message.setStatus(MessageStatus.DELIVERED);

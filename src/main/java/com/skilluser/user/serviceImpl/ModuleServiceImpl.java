@@ -267,6 +267,7 @@ public class ModuleServiceImpl implements ModuleService {
                 map.put("canAdd", p.isCanAdd());
                 map.put("canEdit", p.isCanEdit());
                 map.put("canDelete", p.isCanDelete());
+                map.put("isSidebar",p.getModule().isSidebar());
                 permsList.add(map);
             }
 
