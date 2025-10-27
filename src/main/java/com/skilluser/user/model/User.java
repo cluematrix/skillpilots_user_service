@@ -81,11 +81,7 @@ public class User implements UserDetails {
     }
 
     public User() {
-
     }
-
-
-
 
     @Override
     public boolean isAccountNonExpired() {
