@@ -65,6 +65,8 @@ public class User implements UserDetails {
     private String role;
     private int verified;
 
+    private Long companyId;
+
     public boolean isAccountLocked() {
         if (this.lastFailedLoginAttempt == null) {
             return false;
