@@ -54,7 +54,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(exchange).with("notify");
     }
 
-    // ✅ Fix: add mapping for all NotificationEvent package names
+    //  Fix: add mapping for all NotificationEvent package names
     @Bean
     public MessageConverter jsonMessageConverter() {
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
@@ -68,7 +68,7 @@ public class RabbitMQConfig {
 
         classMapper.setIdClassMapping(idClassMapping);
 
-        // ✅ Allow deserialization from all relevant services
+        //  Allow deserialization from all relevant services
         classMapper.setTrustedPackages(
                 "java.util",
                 "java.lang",
@@ -81,7 +81,7 @@ public class RabbitMQConfig {
         return converter;
     }
 
-    // ✅ Listener factory setup
+    //  Listener factory setup
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
