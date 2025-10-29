@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 // 22/10/2025 - Ashvin Chopkar - Dynamic notification receiver & dispatcher
@@ -37,21 +38,57 @@ public class NotificationConsumerServiceImpl implements NotificationConsumerServ
             return;
         }
 
-        List<User> targetUsers;
+        List<User> targetUsers = new ArrayList<>();
 
-        //  Filter dynamically based on context
-        if (event.getCollegeId() != null) {
-            targetUsers = userRepository.findByRoles_NameInAndCollegeId(event.getTargetRoles(), event.getCollegeId());
-        }
-        else if (event.getCompanyId() != null) {
-            targetUsers = userRepository.findByRoles_NameInAndCompanyId(event.getTargetRoles(), event.getCompanyId());
-            //System.out.println("users>>>zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"+targetUsers);
-        }
-        else {
-            targetUsers = userRepository.findByRoles_NameIn(event.getTargetRoles());
+        for (String role : event.getTargetRoles()) {
+            List<User> usersForRole = new ArrayList<>();
+         //   System.out.println("zzzzzzz");
+            if (event.getCollegeId() != null && event.getDeptId() != null) {
+              //  System.out.println("collegeIdzZzzzzzzzzzzzz"+event.getCollegeId()+"deptIdZZZZZZZZZ"+event.getDeptId()+" "+"role: "+role);
+                usersForRole = userRepository.findByRoles_NameInAndCollegeIdAndDepartment(
+                        List.of(role),
+                        event.getCollegeId(),
+                        event.getDeptId()
+                );
+                System.out.println(" Found HOD users: " + usersForRole.size());
+                targetUsers.addAll(usersForRole);
+            }
+            if (event.getCompanyId() != null) {
+                usersForRole = userRepository.findByRoles_NameInAndCompanyId(
+                        List.of(role),
+                        event.getCompanyId()
+                );
+                System.out.println("  Found company users: " + usersForRole.size());
+            }
+            else if (event.getCollegeId() != null) {
+                usersForRole = userRepository.findByRoles_NameInAndCollegeId(
+                        List.of(role),
+                        event.getCollegeId()
+                );
+            }
+            else {
+                usersForRole = userRepository.findByRoles_NameIn(List.of(role));
+            }
+
+            targetUsers.addAll(usersForRole);
         }
 
 
+
+
+//  Additionally send to the specific student if studentId is present
+        if (event.getStudentId() != null) {
+            userRepository.findById(event.getStudentId())
+                    .ifPresent(targetUsers::add);
+        }
+
+//  Remove duplicate users if any (same user may have multiple roles)
+        targetUsers = targetUsers.stream().distinct().toList();
+
+
+
+
+        // save notifiction in database according to users
         for(User user:targetUsers) {
             Notification notification = new Notification();
             notification.setMessage(event.getMessage());
