@@ -23,6 +23,7 @@ public class Notification {
     private Long receiverId;
     private Long studentId;
     private Long collegeId;
+    private Long deptId;
     private Long companyId;
     private boolean readStatus;
     private LocalDateTime createdAt = LocalDateTime.now();

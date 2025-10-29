@@ -15,6 +15,7 @@ public class NotificationEvent {
     private String message;
     private List<String> targetRoles;
     private Long collegeId;
+    private Long deptId;
     private Long studentId;
     private Long companyId;
 }

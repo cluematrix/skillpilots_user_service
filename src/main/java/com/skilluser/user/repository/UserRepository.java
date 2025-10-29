@@ -28,6 +28,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByRoles_NameInAndCompanyId(List<String> roleNames, Long companyId);
 
+    List<User> findByRoles_NameInAndCollegeIdAndDepartment(List<String> roleNames, Long collegeId, Long deptId);
+
 
 
 }
