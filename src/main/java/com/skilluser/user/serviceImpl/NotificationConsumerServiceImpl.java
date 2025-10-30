@@ -92,11 +92,13 @@ public class NotificationConsumerServiceImpl implements NotificationConsumerServ
         for(User user:targetUsers) {
             Notification notification = new Notification();
             notification.setMessage(event.getMessage());
-            notification.setCollegeId(event.getCollegeId());
-            notification.setCompanyId(event.getCompanyId());
+            Long newCollegeId = Long.valueOf(user.getCollegeId());
+            notification.setCollegeId(newCollegeId);
+            notification.setCompanyId(user.getCompanyId());
             notification.setType(event.getType());
             notification.setCreatedAt(LocalDateTime.now());
             notification.setReceiverId(user.getId());
+            notification.setDeptId(user.getDepartment());
 
             notificationRepository.save(notification);
         }
