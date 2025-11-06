@@ -23,6 +23,7 @@ public class ModuleServiceImpl implements ModuleService {
     private final ModulePermissionRepository modulePermissionRepository;
     private final CustomRoleRepository customRoleRepository;
     private final CustomRolePermissionRepo customRolePermissionRepo;
+
     @Override
     public Module createModule(Module module) {
         return moduleRepository.save(module);
@@ -176,7 +177,6 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
 
-
     @Override
     public void setPermissions(Long roleId, Long collegeId, Long companyId, List<PermissionRequest> permissions) {
         Optional<Role> roleOpt = roleRepository.findById(roleId);
@@ -243,8 +243,11 @@ public class ModuleServiceImpl implements ModuleService {
             Long companyId = user.getCompanyId() != null ? user.getCompanyId() : null;
 
             List<ModulePermission> permissions;
-
-            if (collegeId != null) {
+            System.out.println("Rolessssssssss"+user.getRoles().getName());
+            if (user.getRoles().getName().equals("INT_STUDENT") || user.getRoles().getName().equals("EXT_STUDENT")) {
+                permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+                System.out.println("dddddddddddddddd"+ permissions);
+            } else if (collegeId != null) {
                 permissions = modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
                 if (permissions.isEmpty()) {
                     permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
@@ -259,6 +262,7 @@ public class ModuleServiceImpl implements ModuleService {
                 permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
             }
 
+
             for (ModulePermission p : permissions) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("module", p.getModule().getName());
@@ -267,6 +271,7 @@ public class ModuleServiceImpl implements ModuleService {
                 map.put("canAdd", p.isCanAdd());
                 map.put("canEdit", p.isCanEdit());
                 map.put("canDelete", p.isCanDelete());
+                map.put("isSidebar", p.getModule().isSidebar());
                 permsList.add(map);
             }
 
@@ -294,8 +299,8 @@ public class ModuleServiceImpl implements ModuleService {
 //            response.put("permissions", permsList);
 //        }
         }
-            return response;
-        }
+        return response;
+    }
 
 }
 

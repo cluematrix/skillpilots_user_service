@@ -51,14 +51,24 @@
 			<version>3.0.0</version>
 		</dependency>
 
-		<dependency>
+
+
+        <!-- WebSocket Support -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!-- RabbitMQ (AMQP) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- For STOMP Messaging -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
         </dependency>
 
         <!-- JSON -->

@@ -116,7 +116,7 @@ public class ChatController {
     }
 
 
-    // delivered messege
+    // delivered message
     @MessageMapping("/delivered")
     public void delivered(@Payload LiveChatMessage message) {
         message.setStatus(MessageStatus.DELIVERED);
@@ -153,10 +153,10 @@ public class ChatController {
 
     @MessageMapping("/mediaMessage")
     public void mediaMessage(@Payload LiveChatMessage message, MessageStatus status) {
-        if (message.getId() == null) {
+        if(message.getId() == null) {
             message.setId(UUID.randomUUID().toString());
             message.setCreatedAt(LocalDateTime.now());
-            message.setStatus(status);
+            message.setStatus(MessageStatus.SENT); // Always set SENT by default
 
             if (message.getType() == null) {
                 message.setType(MessageType.FILE);
@@ -164,7 +164,25 @@ public class ChatController {
 
             chatMemory.addMessage(message.getRoomId(), message);
             messagingTemplate.convertAndSend("/topic/" + message.getRoomId(), message);
+
+            if(message.getType() == null) {
+                message.setType(MessageType.FILE);
+            }
+
+            // Determine destination room: private or public
+            String destinationRoom;
+            if(message.getReceiverId() != null && !message.getReceiverId().isEmpty()) {
+                destinationRoom = "private-" + Arrays.asList(message.getSenderId(), message.getReceiverId())
+                        .stream().sorted().collect(Collectors.joining("-"));
+            } else {
+                destinationRoom = message.getRoomId() == null ? "public" : message.getRoomId();
+            }
+
+            chatMemory.addMessage(destinationRoom, message);
+            messagingTemplate.convertAndSend("/topic/" + destinationRoom, message);
+
         }
     }
+
 
 }

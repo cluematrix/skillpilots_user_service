@@ -9,6 +9,7 @@ import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -79,6 +80,7 @@ public class OtpServiceImpl implements OtpService {
         return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);
     }*/
 
+    @Async
     @Override
     public void sendVerificationEmail(String toEmail, String subject, String content)
     {
