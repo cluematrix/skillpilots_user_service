@@ -15,6 +15,7 @@ public class LoginResponse {
 
     private Long companyId;
     private int collegeId;
+    private String photo;
 
     private List<String> user_role;
 

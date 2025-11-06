@@ -48,13 +48,13 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = header.substring(7);
 
         try {
-            // ✅ Extract username first
+            //  Extract username first
             Long id = jwtUtil.extractUserId(token);
 
-            // ✅ Validate token with username
+            //  Validate token with username
             if (id != null && jwtUtil.validateToken(token, id)) {
 
-                // ✅ Extract roles from token
+                // Extract roles from token
                 List<String> roles = jwtUtil.extractRoles(token);
 
                 List<SimpleGrantedAuthority> authorities = roles.stream()
