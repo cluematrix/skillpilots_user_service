@@ -65,6 +65,7 @@ public class RabbitMQConfig {
         idClassMapping.put("com.student.model.NotificationEvent", com.skilluser.user.model.NotificationEvent.class);
         idClassMapping.put("com.company.model.NotificationEvent", com.skilluser.user.model.NotificationEvent.class);
         idClassMapping.put("com.skilluser.user.model.NotificationEvent", com.skilluser.user.model.NotificationEvent.class);
+        idClassMapping.put("com.skillpilot.model.NotificationEvent", com.skilluser.user.model.NotificationEvent.class);
 
         classMapper.setIdClassMapping(idClassMapping);
 
@@ -74,7 +75,8 @@ public class RabbitMQConfig {
                 "java.lang",
                 "com.student.model",
                 "com.company.model",
-                "com.skilluser.user.model"
+                "com.skilluser.user.model",
+                "com.skillpilot.model"
         );
 
         converter.setClassMapper(classMapper);
