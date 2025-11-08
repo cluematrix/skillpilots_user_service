@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Data
 public class ModulePermission {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

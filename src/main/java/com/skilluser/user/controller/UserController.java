@@ -61,6 +61,26 @@ public class UserController {
 
     }
 
+
+    @GetMapping("/all/{id}")
+    public ResponseEntity<UserDto> getByUserIds(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setContactNo(user.getContact_no());
+        dto.setRole(user.getRoles() != null ? user.getRoles().getName() : null);
+        dto.setCollegeId(user.getCollegeId());
+
+        return ResponseEntity.ok(dto);
+    }
+
+
     // Ajay - 07-10-2025 - All data fetch by user id
     @GetMapping("/allUsers/{userId}")
     public ResponseEntity<?> getAllByUserId(@PathVariable Long userId)
@@ -206,6 +226,4 @@ public class UserController {
             }
 
         }
-
-
 }
