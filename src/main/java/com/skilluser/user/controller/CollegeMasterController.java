@@ -10,13 +10,18 @@ import com.skilluser.user.model.UniversityMaster;
 import com.skilluser.user.service.CollegeMasterService;
 import com.skilluser.user.service.StateMasterService;
 import com.skilluser.user.service.UniversityMasterService;
+import com.skilluser.user.utility.ExcelHelper;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 
+// College Master - Ajay - 06-11-2025
 @RestController
 @RequestMapping("/api/v1/users/college")
 @AllArgsConstructor
@@ -26,7 +31,7 @@ public class CollegeMasterController
     private final StateMasterService stateMasterService;
     private final CollegeMasterService collegeMasterService;
 
-    // Add university - Ajay -06-11-2025
+    // Add university
     @PostMapping("/university")
     public ResponseEntity<?> saveUniversity(@RequestBody UniversityMaster universityMaster)
     {
@@ -37,7 +42,7 @@ public class CollegeMasterController
         ));
     }
 
-    //Update University - Ajay - 06-11-2025
+    //Update University
     @PutMapping("/university")
     public ResponseEntity<?> updateUniversity(@RequestBody UniversityMaster universityMaster)
     {
@@ -79,7 +84,7 @@ public class CollegeMasterController
     }
 
 
-    // Get all university by states
+    // Get all university by state
     @GetMapping("/university/{stateId}")
     public ResponseEntity<?> getUniversitiesByState(@PathVariable Long stateId)
     {
@@ -99,8 +104,36 @@ public class CollegeMasterController
         }
     }
 
+    //Delete University
+    @DeleteMapping("/{universityId}")
+    public ResponseEntity<?> deleteUniversity(@PathVariable Long universityId)
+    {
+        try
+        {
+            universityMasterService.deleteUniversity(universityId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "University deleted successfully!",
+                    "status", HttpStatus.OK
+            ));
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.status(404).body(Map.of(
+                    "message", e.getMessage(),
+                    "status", HttpStatus.NOT_FOUND
+            ));
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "message", "Error deleting university",
+                    "status", HttpStatus.INTERNAL_SERVER_ERROR
+            ));
+        }
+    }
 
-    // Add state - Ajay -06-11-2025
+
+    // Add state
     @PostMapping("/state")
     public ResponseEntity<?> saveState(@RequestBody StateMaster stateMaster)
     {
@@ -151,8 +184,35 @@ public class CollegeMasterController
         }
     }
 
+    // delete state
+    @DeleteMapping("/state/{stateId}")
+    public ResponseEntity<?> deleteState(@PathVariable Long stateId)
+    {
+        try
+        {
+            stateMasterService.deleteState(stateId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "State deleted successfully!",
+                    "status", HttpStatus.OK
+            ));
+        }
+        catch (RuntimeException e)
+        {
+            return ResponseEntity.status(404).body(Map.of(
+                    "message", e.getMessage(),
+                    "status", HttpStatus.NOT_FOUND
+            ));
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "message", "Error deleting state",
+                    "status", HttpStatus.INTERNAL_SERVER_ERROR
+            ));
+        }
+    }
 
-    // Add college - Ajay -06-11-2025
+    // Add college
     @PostMapping(value = "/add", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> saveCollege(@RequestBody CollegeRequestDTO dto)
     {
@@ -247,4 +307,34 @@ public class CollegeMasterController
         }
     }
 
+    // Download Excel sheet
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> downloadTemplate()
+    {
+        try
+        {
+            ByteArrayInputStream file = ExcelHelper.generateMasterTemplate();
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=master-template.xlsx")
+                    .body(file.readAllBytes());
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+    // Upload excel sheet
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadMasterData(@RequestParam("file") MultipartFile file)
+    {
+        if (file.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "File is empty"
+            ));
+        }
+        Map<String, Object> response = collegeMasterService.uploadMasterData(file);
+        return ResponseEntity.ok(response);
+    }
 }

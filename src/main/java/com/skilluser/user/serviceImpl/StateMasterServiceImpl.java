@@ -90,5 +90,13 @@ public class StateMasterServiceImpl implements StateMasterService
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteState(Long stateId)
+    {
+        StateMaster state = stateMasterRepository.findById(stateId)
+                .orElseThrow(() -> new RuntimeException("State not found:" + stateId));
+        stateMasterRepository.delete(state);
+    }
+
 
 }

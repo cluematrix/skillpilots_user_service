@@ -107,4 +107,13 @@ public class UniversityMasterServiceImpl implements UniversityMasterService
         )).toList();
     }
 
+    @Override
+    public void deleteUniversity(Long universityId)
+    {
+        UniversityMaster university = universityMasterRepository.findById(universityId)
+                .orElseThrow(() -> new RuntimeException("University Not found :" + universityId));
+
+        universityMasterRepository.delete(university);
+    }
+
 }

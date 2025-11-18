@@ -37,12 +37,12 @@ public class NotificationController {
     // update read status when user seen notification
     @PutMapping("/read/{id}")
     public ResponseEntity<Map<String,String>> markAsRead(@PathVariable Long id) {
-        Map<String,String> responce = new HashMap<>();
+        Map<String,String> response = new HashMap<>();
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
         notification.setReadStatus(true);
         notificationRepository.save(notification);
-        responce.put("message", "user seen notification successfully!");
-        return ResponseEntity.ok(responce);
+        response.put("message", "user seen notification successfully!");
+        return ResponseEntity.ok(response);
     }
 }
