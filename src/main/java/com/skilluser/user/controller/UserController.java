@@ -28,9 +28,6 @@ public class UserController {
     public final UserService userService;
     public final ModelMapper modelMapper;
     private final OtpService otpService;
-
-
-
     private final UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
@@ -42,8 +39,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getByUserId(@PathVariable Long id) {
-
+    public UserDto getByUserId(@PathVariable Long id)
+    {
         User user = userService.getUserById(id);
         UserDto dto = new UserDto();
         dto.setId(user.getId());
@@ -51,7 +48,8 @@ public class UserController {
         dto.setEmail(user.getEmail());
         dto.setContactNo(user.getContact_no());
 
-        if (user.getRoles() != null) {
+        if (user.getRoles() != null)
+        {
             dto.setRole(user.getRoles().getName());
         }
 
@@ -116,12 +114,16 @@ public class UserController {
     public ResponseEntity<String> sendVerificationEmail(
             @RequestParam("toEmail") String toEmail,
             @RequestParam("subject") String subject,
-            @RequestParam("content") String content) {
-        try {
+            @RequestParam("content") String content)
+    {
+        try
+        {
             // Call the service to send the email
             otpService.sendVerificationEmail(toEmail, subject, content);
             return ResponseEntity.ok("Verification email sent successfully to " + toEmail);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // Handle error and return appropriate response
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send verification email: " + e.getMessage());

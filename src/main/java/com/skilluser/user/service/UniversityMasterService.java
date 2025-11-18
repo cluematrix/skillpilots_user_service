@@ -14,4 +14,6 @@ public interface UniversityMasterService
     public List<UniversityResponseDTO> getAllUniversities();
 
     public List<UniversityResponseDTO> getUniversitiesByState(Long stateId);
+
+    public void deleteUniversity(Long universityId);
 }
