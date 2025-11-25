@@ -16,10 +16,7 @@ public class LoginResponse {
     private Long companyId;
     private int collegeId;
     private String photo;
-<<<<<<< HEAD
     private String token;
-=======
->>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 
     private List<String> user_role;
 
