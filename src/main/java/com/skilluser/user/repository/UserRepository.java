@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Optional;
 
+=======
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
     User findByEmail(String username);
@@ -33,6 +36,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByRoles_NameInAndCollegeIdAndDepartment(List<String> roleNames, Long collegeId, Long deptId);
 
+<<<<<<< HEAD
     Optional<User> findByProviderIdAndProviderType(String providerId, AuthProviderType providerType);
+=======
+
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 
 }

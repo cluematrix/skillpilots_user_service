@@ -123,7 +123,70 @@ public class LoginController {
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid username or password"));
+<<<<<<< HEAD
         }
+=======
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("auth_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)   // remove cookie
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+    // decode token shrunkhal 26/sept
+    @GetMapping("/me")
+    public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "valid", false,
+                    "message", "Missing or invalid Authorization header"
+            ));
+        }
+
+        // Extract token from header
+        String token = authHeader.substring(7);
+
+        if (token.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "valid", false,
+                    "message", "Token is empty"
+            ));
+        }
+
+        // Validate token
+        if (!jwtUtils.isValidToken(token)) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "valid", false,
+                    "message", "Token is invalid or expired"
+            ));
+        }
+
+        // Decode token
+        Claims claims = jwtUtils.decodeToken(token);
+        Long userId = claims.get("userId",Long.class);
+        claims.get("deptId", Long.class);
+
+        String username = userRepository.findById(userId).map(User::getName).get();
+        // fetch permission
+        Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
+        return ResponseEntity.ok(Map.of(
+                "valid", true,
+                "user", claims,
+                "permission",permissionsForUser,
+                "name",username
+        ));
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
     }
 
     @PostMapping("/logout")

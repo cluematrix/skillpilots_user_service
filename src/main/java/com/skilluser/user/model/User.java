@@ -67,10 +67,13 @@ public class User implements UserDetails {
     private String role;
     private int verified;
 
+<<<<<<< HEAD
     private String providerId;
 
     @Enumerated(EnumType.STRING)
     private AuthProviderType providerType;
+=======
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 
 
     public boolean isAccountLocked() {
