@@ -1,5 +1,7 @@
 package com.skilluser.user.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.skilluser.user.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +17,12 @@ public class Module {
     private Long id;
     private String name;
     private String createdAt;
+    private String path;
+
+    private ServiceType serviceType;
+    private boolean isActive;
+    @JsonProperty("isSidebar")
+    private boolean isSidebar= false;
 
     @PrePersist
     public void createdAt(){
