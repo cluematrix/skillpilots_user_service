@@ -27,11 +27,19 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/auth/google")
 public class GoogleAuthController {
+<<<<<<< HEAD
 //    @Value("${spring.security.oauth2.client.registration.google.client-id}")
 //    private String clientId;
 //
 //    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
 //    private String clientSecret;
+=======
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String clientSecret;
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 
     @Autowired
     private RestTemplate restTemplate;
@@ -55,8 +63,13 @@ public class GoogleAuthController {
             String tokenEndpoint = "https://oauth2.googleapis.com/token";
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("code", code);
+<<<<<<< HEAD
 //            params.add("client_id", clientId);
 //            params.add("client_secret", clientSecret);
+=======
+            params.add("client_id", clientId);
+            params.add("client_secret", clientSecret);
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
             params.add("redirect_uri", "https://developers.google.com/oauthplayground");
             params.add("grant_type", "authorization_code");
             HttpHeaders headers = new HttpHeaders();
@@ -68,7 +81,10 @@ public class GoogleAuthController {
             ResponseEntity<Map> userInfoResponse = restTemplate.getForEntity(userInfoUrl, Map.class);
             if (userInfoResponse.getStatusCode() == HttpStatus.OK) {
                 Map<String, Object> userInfo = userInfoResponse.getBody();
+<<<<<<< HEAD
 
+=======
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
                 String email = (String) userInfo.get("email");
                 UserDetails userDetails = null;
                 try {
@@ -91,6 +107,9 @@ public class GoogleAuthController {
         }
 
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 }

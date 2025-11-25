@@ -107,8 +107,11 @@
 			<scope>test</scope>
 		</dependency>
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -156,12 +159,17 @@
             <artifactId>jakarta.mail</artifactId>
         </dependency>
 
+<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
 
         <dependency>
+=======
+
+		<dependency>
+>>>>>>> cb7b8de00c0cc80532905ecb6387a299f12b6687
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
