@@ -14,25 +14,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 public class SecurityConfig
 {
-    @Autowired
-    private OAuth2SuccessHandler oAuth2SuccessHandler;
+//    @Autowired
+//    private OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**", "/auth/**").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2Login(httpSecurityOAuth2LoginConfigurer -> httpSecurityOAuth2LoginConfigurer.failureHandler(
-                        (request, response, exception) -> {
-                            log.error("oAuth2 error: {}", exception.getMessage());
-                            response.sendRedirect("/auth/login?error=true");
-                        })
-                        .successHandler(oAuth2SuccessHandler)
-                );
-
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/public/**", "/auth/**").permitAll()
+//                        .anyRequest().authenticated())
+//                .oauth2Login(httpSecurityOAuth2LoginConfigurer -> httpSecurityOAuth2LoginConfigurer.failureHandler(
+//                        (request, response, exception) -> {
+//                            log.error("oAuth2 error: {}", exception.getMessage());
+//                            response.sendRedirect("/auth/login?error=true");
+//                        })
+//                        .successHandler(oAuth2SuccessHandler)
+//                );
+//
+//        return http.build();
+//    }
 }
