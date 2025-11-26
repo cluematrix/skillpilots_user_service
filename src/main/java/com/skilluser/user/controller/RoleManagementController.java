@@ -23,8 +23,8 @@ import java.util.Map;
 // shrunkhal 8/sept
 @RestController
 @RequestMapping("api/v1/users")
-public class RoleManagementController {
-
+public class RoleManagementController
+{
 
     private final RoleService roleService;
     private final ModuleService moduleService;
