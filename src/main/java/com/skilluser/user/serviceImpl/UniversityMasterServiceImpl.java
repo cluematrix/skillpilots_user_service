@@ -72,7 +72,7 @@ public class UniversityMasterServiceImpl implements UniversityMasterService
             dto.setUniversityName(univ.getUniversityName());
             dto.setAddress(univ.getAddress());
 
-            if (univ.getColleges() != null)
+          /*  if (univ.getColleges() != null)
             {
                 dto.setColleges(
                         univ.getColleges().stream().map(college -> new CollegeSummaryDTO(
@@ -83,7 +83,7 @@ public class UniversityMasterServiceImpl implements UniversityMasterService
                                 college.getType()
                         )).collect(Collectors.toList())
                 );
-            }
+            }*/
             return dto;
         }).collect(Collectors.toList());
     }
