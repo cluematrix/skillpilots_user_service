@@ -69,12 +69,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // ✅ Set authentication in context
+                //  Set authentication in context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
         } catch (Exception ex) {
-            // ✅ On error → clear context & send 401
+
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

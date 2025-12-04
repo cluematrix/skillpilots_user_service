@@ -1,6 +1,7 @@
 package com.skilluser.user.model;
 
 
+import com.skilluser.user.enums.AuthProviderType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -66,6 +67,10 @@ public class User implements UserDetails {
     private String role;
     private int verified;
 
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProviderType providerType;
 
 
     public boolean isAccountLocked() {
