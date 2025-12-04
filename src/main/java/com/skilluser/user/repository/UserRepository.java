@@ -1,11 +1,14 @@
 package com.skilluser.user.repository;
 
+import com.skilluser.user.enums.AuthProviderType;
 import com.skilluser.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
     User findByEmail(String username);
@@ -30,6 +33,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByRoles_NameInAndCollegeIdAndDepartment(List<String> roleNames, Long collegeId, Long deptId);
 
+
+    Optional<User> findByProviderIdAndProviderType(String providerId, AuthProviderType providerType);
 
 
 }

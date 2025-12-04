@@ -15,6 +15,8 @@ public class ChatMemory {
 
     private Map<String, List<LiveChatMessage>> roomMessages = new ConcurrentHashMap<>();
 
+
+
     public void addMessage(String roomId, LiveChatMessage message) {
         roomMessages.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(message);
         // Keep only last 50 messages
@@ -34,10 +36,10 @@ public class ChatMemory {
             for (LiveChatMessage msg : messages) {
                 if (msg.getId().equals(messageId)) {
                     msg.setStatus(newStatus);
-                    return true; // updated successfully
+                    return true;
                 }
             }
         }
-        return false; // not found
+        return false;
     }
 }
