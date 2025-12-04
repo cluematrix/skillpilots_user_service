@@ -22,7 +22,7 @@ import java.util.Map;
 
 // shrunkhal 8/sept
 @RestController
-@RequestMapping("api/v1/users")
+@RequestMapping("/api/v1/users")
 public class RoleManagementController
 {
 
@@ -127,7 +127,8 @@ public class RoleManagementController
     }
 
     @PostMapping("/custom_role")
-    public ResponseEntity<?> createCustomRole(@RequestBody CustomRole customRole) {
+    public ResponseEntity<?> createCustomRole(@RequestBody CustomRole customRole)
+    {
         return ResponseEntity.status(200).body(roleService.createCustomRole(customRole));
     }
 
