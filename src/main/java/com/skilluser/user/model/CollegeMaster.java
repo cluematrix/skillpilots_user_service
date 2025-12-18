@@ -24,7 +24,7 @@ public class CollegeMaster {
     private String collegeName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "state_id", nullable = false)
+    @JoinColumn(name = "state_id", nullable = true)
     private StateMaster state;
 
     @ManyToOne(fetch = FetchType.LAZY)

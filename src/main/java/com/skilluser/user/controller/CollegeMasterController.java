@@ -287,7 +287,7 @@ public class CollegeMasterController
     }
 
     // Get College by university
-    @GetMapping("/college/{universityId}")
+    @GetMapping("/collegeUniversity/{universityId}")
     public ResponseEntity<?> getCollegesByUniversity(@PathVariable Long universityId)
     {
         try
