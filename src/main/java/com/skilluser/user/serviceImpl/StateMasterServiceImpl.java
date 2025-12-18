@@ -74,7 +74,7 @@ public class StateMasterServiceImpl implements StateMasterService
             dto.setStateName(state.getStateName());
             dto.setCountry(state.getCountry());
 
-            if (state.getColleges() != null)
+           /* if (state.getColleges() != null)
             {
                 dto.setColleges(
                         state.getColleges().stream().map(college -> new CollegeSummaryDTO(
@@ -85,7 +85,7 @@ public class StateMasterServiceImpl implements StateMasterService
                                 college.getType()
                         )).collect(Collectors.toList())
                 );
-            }
+            }*/
             return dto;
         }).collect(Collectors.toList());
     }
