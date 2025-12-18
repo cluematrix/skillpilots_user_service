@@ -15,3 +15,4 @@ EXPOSE 7005
 
 # Run the jar file, setting the server port to 7005
 CMD ["java", "-jar", "app.jar", "--server.port=7005"]
+
