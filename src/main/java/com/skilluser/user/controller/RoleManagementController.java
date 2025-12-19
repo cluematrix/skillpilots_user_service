@@ -23,8 +23,7 @@ import java.util.Map;
 // shrunkhal 8/sept
 @RestController
 @RequestMapping("/api/v1/users")
-public class RoleManagementController
-{
+public class RoleManagementController {
 
     private final RoleService roleService;
     private final ModuleService moduleService;
@@ -61,8 +60,7 @@ public class RoleManagementController
     @PostMapping("/role/permissions") // get permission   shrunkhal 08/sep
     public ResponseEntity<?> assignModulePermissions(@RequestBody ModulePermissionBulkDTO request) {
         try {
-            return ResponseEntity.status(200).body(Map.of(
-                    "data", moduleService.addModulePermissions(request), "msg", "Permission give successfully"));
+            return ResponseEntity.status(200).body(Map.of("data", moduleService.addModulePermissions(request), "msg", "Permission give successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(500).body(Map.of("msg", e.getMessage()));
         }
@@ -90,8 +88,7 @@ public class RoleManagementController
             roleService.deleteRole(id);
             return ResponseEntity.ok("Role deleted successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Role not found with id: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role not found with id: " + id);
         }
     }
 
@@ -108,38 +105,25 @@ public class RoleManagementController
 //    }
 
     @PostMapping("/save")
-    public List<ModulePermission> saveOrUpdatePermissions(
-            @RequestParam Long roleId,
-            @RequestParam(required = false) Long collegeId,
-            @RequestParam(required = false) Long companyId,
-            @RequestBody List<ModulePermissionDTO> permissions) {
+    public List<ModulePermission> saveOrUpdatePermissions(@RequestParam Long roleId, @RequestParam(required = false) Long collegeId, @RequestParam(required = false) Long companyId, @RequestBody List<ModulePermissionDTO> permissions) {
 
         return moduleService.saveOrUpdatePermissions(roleId, collegeId, companyId, permissions);
     }
 
     @GetMapping("/permissions")
-    public List<ModulePermission> getPermissions(
-            @RequestParam Long roleId,
-            @RequestParam(required = false) Long collegeId,
-            @RequestParam(required = false) Long companyId) {
+    public List<ModulePermission> getPermissions(@RequestParam Long roleId, @RequestParam(required = false) Long collegeId, @RequestParam(required = false) Long companyId) {
 
         return moduleService.getPermissionsForRole(roleId, collegeId, companyId);
     }
 
     @PostMapping("/custom_role")
-    public ResponseEntity<?> createCustomRole(@RequestBody CustomRole customRole)
-    {
+    public ResponseEntity<?> createCustomRole(@RequestBody CustomRole customRole) {
         return ResponseEntity.status(200).body(roleService.createCustomRole(customRole));
     }
 
     @PostMapping("/set")
     public ResponseEntity<?> setPermissions(@RequestBody PermissionSetRequest request) {
-        moduleService.setPermissions(
-                request.getRoleId(),
-                request.getCollegeId(),
-                request.getCompanyId(),
-                request.getPermissions()
-        );
+        moduleService.setPermissions(request.getRoleId(), request.getCollegeId(), request.getCompanyId(), request.getPermissions());
         return ResponseEntity.ok("Permissions updated successfully!");
     }
 
