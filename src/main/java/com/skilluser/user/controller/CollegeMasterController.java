@@ -25,38 +25,32 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/users/college")
 @AllArgsConstructor
-public class CollegeMasterController
-{
+public class CollegeMasterController {
     private final UniversityMasterService universityMasterService;
     private final StateMasterService stateMasterService;
     private final CollegeMasterService collegeMasterService;
 
     // Add university
     @PostMapping("/university")
-    public ResponseEntity<?> saveUniversity(@RequestBody UniversityMaster universityMaster)
-    {
+    public ResponseEntity<?> saveUniversity(@RequestBody UniversityMaster universityMaster) {
         UniversityMaster university = universityMasterService.saveUniversity(universityMaster);
         return ResponseEntity.ok(Map.of(
                 "message", "University added successfully!",
-                "date",university
+                "date", university
         ));
     }
 
     //Update University
     @PutMapping("/university")
-    public ResponseEntity<?> updateUniversity(@RequestBody UniversityMaster universityMaster)
-    {
-        try
-        {
+    public ResponseEntity<?> updateUniversity(@RequestBody UniversityMaster universityMaster) {
+        try {
             UniversityResponseDTO updated =
                     universityMasterService.updateUniversity(universityMaster);
             return ResponseEntity.ok(Map.of(
                     "message", "University updated successfully!",
                     "data", updated
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage()
             ));
@@ -65,18 +59,14 @@ public class CollegeMasterController
 
     // Get all university
     @GetMapping("/university")
-    public ResponseEntity<?> getAllUniversity()
-    {
-        try
-        {
+    public ResponseEntity<?> getAllUniversity() {
+        try {
             List<UniversityResponseDTO> allUniversity = universityMasterService.getAllUniversities();
             return ResponseEntity.ok(Map.of(
                     "message", "University Fetched successfully!",
                     "data", allUniversity
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage()
             ));
@@ -86,18 +76,14 @@ public class CollegeMasterController
 
     // Get all university by state
     @GetMapping("/university/{stateId}")
-    public ResponseEntity<?> getUniversitiesByState(@PathVariable Long stateId)
-    {
-        try
-        {
+    public ResponseEntity<?> getUniversitiesByState(@PathVariable Long stateId) {
+        try {
             List<UniversityResponseDTO> universities = universityMasterService.getUniversitiesByState(stateId);
             return ResponseEntity.ok(Map.of(
                     "message", "Universities fetched successfully!",
                     "data", universities
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
@@ -106,25 +92,19 @@ public class CollegeMasterController
 
     //Delete University
     @DeleteMapping("/{universityId}")
-    public ResponseEntity<?> deleteUniversity(@PathVariable Long universityId)
-    {
-        try
-        {
+    public ResponseEntity<?> deleteUniversity(@PathVariable Long universityId) {
+        try {
             universityMasterService.deleteUniversity(universityId);
             return ResponseEntity.ok(Map.of(
                     "message", "University deleted successfully!",
                     "status", HttpStatus.OK
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage(),
                     "status", HttpStatus.NOT_FOUND
             ));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
                     "message", "Error deleting university",
                     "status", HttpStatus.INTERNAL_SERVER_ERROR
@@ -135,30 +115,25 @@ public class CollegeMasterController
 
     // Add state
     @PostMapping("/state")
-    public ResponseEntity<?> saveState(@RequestBody StateMaster stateMaster)
-    {
+    public ResponseEntity<?> saveState(@RequestBody StateMaster stateMaster) {
         StateMaster state = stateMasterService.saveState(stateMaster);
         return ResponseEntity.ok(Map.of(
                 "message", "State added successfully!",
-                "date",state
+                "date", state
         ));
     }
 
     // Update State
     @PutMapping("/state")
-    public ResponseEntity<?> updateState(@RequestBody StateMaster stateMaster)
-    {
-        try
-        {
+    public ResponseEntity<?> updateState(@RequestBody StateMaster stateMaster) {
+        try {
             StateResponseDTO updated =
                     stateMasterService.updateState(stateMaster);
             return ResponseEntity.ok(Map.of(
                     "message", "University updated successfully!",
                     "data", updated
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage()
             ));
@@ -166,18 +141,14 @@ public class CollegeMasterController
     }
 
     @GetMapping("/state")
-    public ResponseEntity<?> getAllState()
-    {
-        try
-        {
+    public ResponseEntity<?> getAllState() {
+        try {
             List<StateResponseDTO> allState = stateMasterService.getAllStates();
             return ResponseEntity.ok(Map.of(
                     "message", "University Fetched successfully!",
                     "data", allState
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage()
             ));
@@ -186,25 +157,19 @@ public class CollegeMasterController
 
     // delete state
     @DeleteMapping("/state/{stateId}")
-    public ResponseEntity<?> deleteState(@PathVariable Long stateId)
-    {
-        try
-        {
+    public ResponseEntity<?> deleteState(@PathVariable Long stateId) {
+        try {
             stateMasterService.deleteState(stateId);
             return ResponseEntity.ok(Map.of(
                     "message", "State deleted successfully!",
                     "status", HttpStatus.OK
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage(),
                     "status", HttpStatus.NOT_FOUND
             ));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
                     "message", "Error deleting state",
                     "status", HttpStatus.INTERNAL_SERVER_ERROR
@@ -214,8 +179,7 @@ public class CollegeMasterController
 
     // Add college
     @PostMapping(value = "/add", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> saveCollege(@RequestBody CollegeRequestDTO dto)
-    {
+    public ResponseEntity<?> saveCollege(@RequestBody CollegeRequestDTO dto) {
         CollegeResponseDTO college = collegeMasterService.saveCollege(dto);
         return ResponseEntity.ok(Map.of(
                 "message", "College added successfully!",
@@ -225,24 +189,18 @@ public class CollegeMasterController
 
     // Update college
     @PutMapping("/update")
-    public ResponseEntity<?> updateCollege(@RequestBody CollegeRequestDTO dto)
-    {
-        try
-        {
+    public ResponseEntity<?> updateCollege(@RequestBody CollegeRequestDTO dto) {
+        try {
             CollegeResponseDTO updated = collegeMasterService.updateCollege(dto);
             return ResponseEntity.ok(Map.of(
                     "message", "College updated successfully!",
                     "data", updated
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
                     "message", "An error occurred while updating the college"
             ));
@@ -251,8 +209,7 @@ public class CollegeMasterController
 
     // Get all colleges
     @GetMapping("/all")
-    public ResponseEntity<?> getAllColleges()
-    {
+    public ResponseEntity<?> getAllColleges() {
         List<CollegeResponseDTO> colleges = collegeMasterService.getAllColleges();
         return ResponseEntity.ok(Map.of(
                 "message", "All colleges fetched successfully!",
@@ -262,24 +219,18 @@ public class CollegeMasterController
 
     // Get colleges by state
     @GetMapping("/{stateId}")
-    public ResponseEntity<?> getCollegesByState(@PathVariable Long stateId)
-    {
-        try
-        {
+    public ResponseEntity<?> getCollegesByState(@PathVariable Long stateId) {
+        try {
             List<CollegeResponseDTO> colleges = collegeMasterService.getCollegesByState(stateId);
             return ResponseEntity.ok(Map.of(
                     "message", "Colleges fetched successfully by state ID: " + stateId,
                     "data", colleges
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
                     "message", "An error occurred while fetching colleges by state"
             ));
@@ -288,19 +239,15 @@ public class CollegeMasterController
 
     // Get College by university
     @GetMapping("/collegeUniversity/{universityId}")
-    public ResponseEntity<?> getCollegesByUniversity(@PathVariable Long universityId)
-    {
-        try
-        {
+    public ResponseEntity<?> getCollegesByUniversity(@PathVariable Long universityId) {
+        try {
             List<CollegeResponseDTO> colleges =
                     collegeMasterService.getCollegesByUniversity(universityId);
             return ResponseEntity.ok(Map.of(
                     "message", "Colleges fetched successfully!",
                     "data", colleges
             ));
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
@@ -309,27 +256,21 @@ public class CollegeMasterController
 
     // Download Excel sheet
     @GetMapping("/download")
-    public ResponseEntity<byte[]> downloadTemplate()
-    {
-        try
-        {
+    public ResponseEntity<byte[]> downloadTemplate() {
+        try {
             ByteArrayInputStream file = ExcelHelper.generateMasterTemplate();
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=master-template.xlsx")
                     .body(file.readAllBytes());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(null);
         }
     }
 
     // Upload excel sheet
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadMasterData(@RequestParam("file") MultipartFile file)
-    {
-        if (file.isEmpty())
-        {
+    public ResponseEntity<?> uploadMasterData(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", "File is empty"
             ));
