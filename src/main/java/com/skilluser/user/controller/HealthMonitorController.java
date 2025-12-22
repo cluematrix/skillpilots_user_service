@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/users/monitor")
-public class HealthMonitorController
-{
+public class HealthMonitorController {
 
     @Autowired
     private StudentServiceClient studentClient;
@@ -41,8 +41,7 @@ public class HealthMonitorController
     private int userServicePort;
 
     @GetMapping("/all")
-    public ResponseEntity<Map<String, Object>> checkAllServices()
-    {
+    public ResponseEntity<Map<String, Object>> checkAllServices() {
         Map<String, Object> allStatus = new HashMap<>();
         allStatus.put("timestamp", LocalDateTime.now());
 
@@ -60,12 +59,10 @@ public class HealthMonitorController
         boolean isHealthy = true;
         String message = isHealthy ? "Running normally" : "Issues detected";
 
-        try
-        {
+        try {
             Thread.sleep(1);
+        } catch (InterruptedException ignored) {
         }
-        catch (InterruptedException ignored)
-        {}
 
         long end = System.nanoTime();
 
@@ -84,35 +81,26 @@ public class HealthMonitorController
         return ResponseEntity.ok(allStatus);
     }
 
-    private ServiceHealthStatus getServiceStatus(String serviceName, String url, Object client)
-    {
+    private ServiceHealthStatus getServiceStatus(String serviceName, String url, Object client) {
         ServiceHealthStatus status = new ServiceHealthStatus();
         status.setServiceName(serviceName);
         status.setUrl(url);
         status.setTimestamp(LocalDateTime.now());
 
         long start = System.currentTimeMillis();
-        try
-        {
-            if (client instanceof StudentServiceClient)
-            {
+        try {
+            if (client instanceof StudentServiceClient) {
                 ((StudentServiceClient) client).checkHealth();
-            }
-            else if (client instanceof CollegeServiceClient)
-            {
+            } else if (client instanceof CollegeServiceClient) {
                 ((CollegeServiceClient) client).checkHealth();
-            }
-            else if (client instanceof CompanyServiceClient)
-            {
+            } else if (client instanceof CompanyServiceClient) {
                 ((CompanyServiceClient) client).checkHealth();
             }
             long end = System.currentTimeMillis();
             status.setStatus("UP");
             status.setResponseTime(end - start);
             status.setMessage("Service running normally");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             long end = System.currentTimeMillis();
             status.setStatus("DOWN");
             status.setResponseTime(end - start);
