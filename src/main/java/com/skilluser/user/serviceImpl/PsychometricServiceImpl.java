@@ -148,7 +148,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         }
 
         // CALL LLM (ONLY Q + A)
-     //   String aiResult = llmService.analyze(attempt.getUserId(), answers);
+       //   String aiResult = llmService.analyze(attempt.getUserId(), answers);
 
         // SAVE AI RESULT
 //        PsychometricResult result = new PsychometricResult();
