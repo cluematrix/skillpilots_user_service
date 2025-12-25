@@ -33,4 +33,6 @@ public class PsychometricQuestion {
 
     @Column(nullable = false, length = 1000)
     private String questionText;
+
+    private boolean isDelete;
 }

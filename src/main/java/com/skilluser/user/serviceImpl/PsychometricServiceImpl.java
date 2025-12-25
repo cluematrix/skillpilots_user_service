@@ -1,19 +1,28 @@
 package com.skilluser.user.serviceImpl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skilluser.user.dto.*;
+import com.skilluser.user.dto.ai.AiAnalysisPayload;
+import com.skilluser.user.dto.ai.AiAnswerPayload;
+import com.skilluser.user.dto.ai.AttemptPayload;
+import com.skilluser.user.dto.ai.QuestionPayload;
 import com.skilluser.user.enums.QuestionType;
 import com.skilluser.user.enums.TestSection;
 import com.skilluser.user.model.User;
 import com.skilluser.user.model.psychomatrictest.*;
 import com.skilluser.user.repository.*;
 import com.skilluser.user.service.PsychometricService;
+import com.skilluser.user.utility.AiClient;
 import com.skilluser.user.utility.PaginationUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -26,6 +35,10 @@ public class PsychometricServiceImpl implements PsychometricService {
     private final PsychometricAttemptRepository attemptRepository;
     private final PsychometricAnswerRepository answerRepository;
     private final UserRepository userRepository;
+    private final AiClient aiClient;
+    private final PsychometricResultRepository psychometricResultRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public PsychometricTest createTest(PsychometricTest psychometricTest) {
@@ -91,7 +104,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         for (TestSection section : TestSection.values()) {
 
             List<PsychometricQuestion> questions =
-                    psychometricQuestionRepository.findByTestIdAndSection(test.getId(), section);
+                    psychometricQuestionRepository.findByTestIdAndSectionAndIsDeleteFalse(test.getId(), section);
 
             Collections.shuffle(questions);
 
@@ -110,60 +123,123 @@ public class PsychometricServiceImpl implements PsychometricService {
     }
 
     @Override
-    public Map<String, Object> submitTest(Long attemptId, Long userId, List<AnswerDto> answers) {
+    @Transactional
+    public Map<String, Object> submitTest(
+            Long attemptId,
+            Long userId,
+            List<AnswerDto> answers) {
+
+        // 1️⃣ Attempt
         PsychometricAttempt attempt = attemptRepository.findById(attemptId)
                 .orElseThrow(() -> new RuntimeException("Attempt not found"));
 
-        //  Prevent double submission
         if (attempt.isSubmitted()) {
             throw new RuntimeException("Test already submitted");
         }
 
-        // Clean safety: remove any existing answers for this attempt
-        // (important if frontend retries)
-
+        // 2️⃣ Save answers
         for (AnswerDto a : answers) {
 
             PsychometricQuestion question =
                     psychometricQuestionRepository.findById(a.getQuestionId())
                             .orElseThrow(() -> new RuntimeException("Question not found"));
 
-            PsychometricAnswer answer = new PsychometricAnswer();
-            answer.setAttempt(attempt);
-            answer.setQuestion(question);
-            answer.setSelectedAnswer(a.getSelectedAnswer());
-            answer.setDescriptiveAnswer(a.getDescriptiveAnswer());
+            PsychometricAnswer ans = new PsychometricAnswer();
+            ans.setAttempt(attempt);
+            ans.setQuestion(question);
+            ans.setSelectedAnswer(a.getSelectedAnswer());
+            ans.setDescriptiveAnswer(a.getDescriptiveAnswer());
 
-            answerRepository.save(answer);
+            answerRepository.save(ans);
         }
 
+        // 3️⃣ Mark submitted
         attempt.setSubmitted(true);
         attemptRepository.save(attempt);
 
-        List<PsychometricAnswer> ans =
+        // 4️⃣ Fetch saved answers
+        List<PsychometricAnswer> savedAnswers =
                 answerRepository.findByAttemptId(attempt.getId());
 
-        if (answers.isEmpty()) {
-            throw new RuntimeException("No answers submitted");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🔥 BUILD ATTEMPT PAYLOAD ONCE (NEVER NULL)
+        AttemptPayload attemptPayload = new AttemptPayload();
+        attemptPayload.setId(attempt.getId());
+        attemptPayload.setUserId(user.getId());
+        attemptPayload.setSubmitted(attempt.isSubmitted());
+        attemptPayload.setStartedAt(
+                attempt.getStartedAt()
+                        .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        );
+
+        // 5️⃣ BUILD AI ANSWERS
+        List<AiAnswerPayload> aiAnswers = new ArrayList<>();
+
+        for (PsychometricAnswer a : savedAnswers) {
+
+            AiAnswerPayload p = new AiAnswerPayload();
+            p.setId(a.getId());
+            p.setAttempt(attemptPayload);   // 🔥 NEVER NULL
+
+            QuestionPayload q = new QuestionPayload();
+            q.setId(String.valueOf(a.getQuestion().getId()));
+            q.setSection(a.getQuestion().getSection().name());
+            q.setType(a.getQuestion().getType().name());
+            q.setQuestionText(a.getQuestion().getQuestionText());
+
+            p.setQuestion(q);
+            p.setSelectedAnswer(a.getSelectedAnswer());
+            p.setDescriptiveAnswer(a.getDescriptiveAnswer());
+
+            aiAnswers.add(p);
         }
 
-        // CALL LLM (ONLY Q + A)
-       //   String aiResult = llmService.analyze(attempt.getUserId(), answers);
+        AiAnalysisPayload aiPayload = new AiAnalysisPayload();
+        aiPayload.setAnswers(aiAnswers);
+        Object aiResponseObject = aiClient.callAiAnalysis(aiPayload);
 
-        // SAVE AI RESULT
-//        PsychometricResult result = new PsychometricResult();
-//        result.setAttempt(attempt);
-//        result.setAiSummary(aiResult);
+        String aiSummaryJson;
 
-       // resultRepo.save(result);
-       User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User Not Found"+userId));
+        try {
+            aiSummaryJson = objectMapper.writeValueAsString(aiResponseObject);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert AI response to JSON", e);
+        }
+        Object summary = aiClient.callAiAnalysis(aiPayload);
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("answers",ans);
-        map.put("userId",userId);
-        map.put("username",user.getName());
+        PsychometricResult result = new PsychometricResult();
+        result.setAttempt(attempt);
+        result.setAiSummary(aiSummaryJson);
+        result.setUserId(userId);
+        psychometricResultRepository.save(result);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", user.getId());
+        map.put("username", user.getName());
+        map.put("summary", summary);
+
         return map;
     }
+
+    @Override
+    public List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException {
+
+        List<PsychometricResult> results =
+                psychometricResultRepository.findByUserIdOrderByGeneratedAtDesc(userId);
+
+        List<Map<String, Object>> summaries = new ArrayList<>();
+
+        for (PsychometricResult r : results) {
+            summaries.add(
+                    objectMapper.readValue(r.getAiSummary(), Map.class)
+            );
+        }
+
+        return summaries;
+    }
+
 
     private QuestionDto mapToDto(PsychometricQuestion q) {
 
