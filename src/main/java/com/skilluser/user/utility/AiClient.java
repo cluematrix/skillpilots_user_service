@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.skilluser.user.dto.AiAnalysisRequest;
 import com.skilluser.user.dto.ai.AiAnalysisPayload;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,8 +18,8 @@ public class AiClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final String AI_URL =
-            "http://192.168.1.19:8000/api/v1/psychometric/analysis";
+    @Value("${ai.url}")
+    private String AI_URL;
 
 
 
