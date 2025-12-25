@@ -7,5 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PsychometricQuestionRepository extends JpaRepository<PsychometricQuestion,Long> {
-    List<PsychometricQuestion> findByTestIdAndSection(Long id, TestSection section);
-}
+    // Fetch only active questions
+    List<PsychometricQuestion> findByTestIdAndSectionAndIsDeleteFalse(
+            Long testId,
+            TestSection section
+    );}
