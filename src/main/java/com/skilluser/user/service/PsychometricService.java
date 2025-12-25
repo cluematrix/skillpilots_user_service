@@ -1,5 +1,6 @@
 package com.skilluser.user.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.skilluser.user.dto.AddQuestionsRequest;
 import com.skilluser.user.dto.AnswerDto;
 import com.skilluser.user.dto.StartTestRequest;
@@ -13,13 +14,14 @@ import java.util.Map;
 public interface PsychometricService {
 
     public PsychometricTest createTest(PsychometricTest psychometricTest);
-    Map<String,Object> getTests(Pageable pageable);
-    public void addQuestions(AddQuestionsRequest req) ;
+
+    Map<String, Object> getTests(Pageable pageable);
+
+    public void addQuestions(AddQuestionsRequest req);
 
     public StartTestResponse startTest(StartTestRequest req);
 
-    public Map<String, Object> submitTest(Long attemptId, Long userId, List<AnswerDto> answers) ;
+    public Map<String, Object> submitTest(Long attemptId, Long userId, List<AnswerDto> answers);
 
-
-
-    }
+    public List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException;
+}
