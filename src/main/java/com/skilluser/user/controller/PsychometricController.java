@@ -21,8 +21,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/user/psychometric")
-@CrossOrigin(origins = {"*"})
+@RequestMapping("/api/v1/users/psychometric")
 
 public class PsychometricController {
 
