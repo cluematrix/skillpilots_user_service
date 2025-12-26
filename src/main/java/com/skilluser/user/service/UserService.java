@@ -22,6 +22,10 @@ public interface UserService {
  public User getAllDataByUserId(Long userId);
 
  public Map<String, Object> checkPayment(Long userId);
+    public Map<String, Object> getPlanAmount(
+            Long userId
+
+    );
 
 
 }
