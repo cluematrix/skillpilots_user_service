@@ -282,6 +282,7 @@ public class ModuleServiceImpl implements ModuleService {
             response.put("permissions", permsList);
             Map<String, Object> map = userService.checkPayment(userId);
             response.put("payment",map);
+            response.put("plan",userService.getPlanAmount(userId));
 
 //        } else if (user.getCustomRole() != null) { // Custom role
 //            List<CustomRolePermission> permissions =
