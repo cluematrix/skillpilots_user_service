@@ -3,6 +3,7 @@ package com.skilluser.user.service;
 import com.skilluser.user.model.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
  public User getUserById(Long id);
@@ -19,6 +20,8 @@ public interface UserService {
  public User forgotPassword(String email);
 
  public User getAllDataByUserId(Long userId);
+
+ public Map<String, Object> checkPayment(Long userId);
 
 
 }
