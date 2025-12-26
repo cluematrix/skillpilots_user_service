@@ -27,6 +27,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     private PaymentHistoryRepo paymentHistoryRepo;
     @Autowired private PaymentStatusRepo paymentStatusRepo;
+    @Autowired
+    private PlanDetailsRepository planDetailsRepository;
 
     @Autowired
     private OtpService otpService;
@@ -189,6 +191,46 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         response.put("hasPaid", true);
         return response;
     }
+
+    @Override
+    public Map<String, Object> getPlanAmount(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        boolean hasPaid = false;
+        String role = user.getRoles().getName();
+        Map<String, Object> response = new HashMap<>();
+
+        PlanDetails plan = null;
+
+        //  EXTERNAL → BASIC ONLY
+        if ("EXT_STUDENT".equalsIgnoreCase(role)) {
+            plan = planDetailsRepository.findByCollegeId(0L).orElse(null);
+        }
+
+        //  INTERNAL
+        else if ("INT_STUDENT".equalsIgnoreCase(role)) {
+             Long collegeId =(long)user.getCollegeId();
+            plan = planDetailsRepository.findByCollegeId(collegeId).orElse(null);
+
+            // fallback to BASIC
+            if (plan == null) {
+                plan = planDetailsRepository.findByCollegeId(0L).orElse(null);
+            }
+        }
+
+        //  FINAL SAFE RESPONSE
+        if (plan == null) {
+            response.put("amount", 0);
+            response.put("totalAmt", 0);
+        } else {
+            response.put("amount", plan.getAmount());
+            response.put("totalAmt", plan.getTotalAmt());
+        }
+
+        return response;
+    };
+
 
     public String generateOTP()
     {
