@@ -23,7 +23,7 @@ public interface PaymentHistoryRepo extends JpaRepository<PaymentHistory, Long> 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from PaymentHistory p where p.orderId = :orderId")
     Optional<PaymentHistory> lockByOrderId(@Param("orderId") String orderId);
-  public  PaymentHistory findTopByUserIdAndStatusOrderByPaymentDateDesc(Long studentId, String success);
+  PaymentHistory findTopByUserIdAndStatusOrderByPaymentDateDesc(Long studentId, String success);
 
 
 }

@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface UniversityMasterService
 {
-    public UniversityMaster saveUniversity(UniversityMaster universityMaster);
+    UniversityMaster saveUniversity(UniversityMaster universityMaster);
 
-    public UniversityResponseDTO updateUniversity(UniversityMaster universityMaster);
+    UniversityResponseDTO updateUniversity(UniversityMaster universityMaster);
 
-    public List<UniversityResponseDTO> getAllUniversities();
+    List<UniversityResponseDTO> getAllUniversities();
 
-    public List<UniversityResponseDTO> getUniversitiesByState(Long stateId);
+    List<UniversityResponseDTO> getUniversitiesByState(Long stateId);
 
-    public void deleteUniversity(Long universityId);
+    void deleteUniversity(Long universityId);
 }

@@ -7,10 +7,10 @@ import java.util.Map;
 
 public interface StickyNotesService
 {
-    public StickyNotes addStickyNotes(StickyNotes stickyNotes,Long userId);
-    public StickyNotes updateStickyNotes(StickyNotes stickyNotes,Long noteId);
-    public Map<String,Object> getAllNotesByUserId(Long userId,int page,int size,
-                                                  String sortBy,String direction);
-    public void deleteNotesById(Long noteId);
+    StickyNotes addStickyNotes(StickyNotes stickyNotes, Long userId);
+    StickyNotes updateStickyNotes(StickyNotes stickyNotes, Long noteId);
+    Map<String,Object> getAllNotesByUserId(Long userId, int page, int size,
+                                           String sortBy, String direction);
+    void deleteNotesById(Long noteId);
 
 }

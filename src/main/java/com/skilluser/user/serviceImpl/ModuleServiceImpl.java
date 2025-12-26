@@ -239,7 +239,7 @@ public class ModuleServiceImpl implements ModuleService {
 
         if (user.getRoles() != null) { // Predefined role
             Long roleId = user.getRoles().getId();
-            long id = (long) user.getCollegeId();  // int → Long
+            long id = user.getCollegeId();  // int → Long
 
             Long collegeId = user.getCollegeId() != 0 ? id : null;
             Long companyId = user.getCompanyId() != null ? user.getCompanyId() : null;

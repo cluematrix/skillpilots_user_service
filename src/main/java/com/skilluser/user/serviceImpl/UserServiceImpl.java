@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if ("INT_STUDENT".equalsIgnoreCase(role)) {
 
             PaymentStatus paymentStatus =
-                    paymentStatusRepo.findByCollegeId((long) user.getCollegeId());
+                    paymentStatusRepo.findByCollegeId(user.getCollegeId());
 
             if (paymentStatus != null
                     && "PAID".equalsIgnoreCase(paymentStatus.getStatus())) {
@@ -229,7 +229,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return response;
-    };
+    }
 
 
     public String generateOTP()
