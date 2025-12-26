@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserService {
- public User getUserById(Long id);
+ User getUserById(Long id);
 
     List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId);
 
@@ -15,14 +15,14 @@ public interface UserService {
     List<User> findHodByDepartment(Long roleId, Long departmentId);
 
 
- public User findByUsername(String username);
- public boolean changePassword(Long userId, String oldPassword, String newPassword);
- public User forgotPassword(String email);
+ User findByUsername(String username);
+ boolean changePassword(Long userId, String oldPassword, String newPassword);
+ User forgotPassword(String email);
 
- public User getAllDataByUserId(Long userId);
+ User getAllDataByUserId(Long userId);
 
- public Map<String, Object> checkPayment(Long userId);
-    public Map<String, Object> getPlanAmount(
+ Map<String, Object> checkPayment(Long userId);
+    Map<String, Object> getPlanAmount(
             Long userId
 
     );
