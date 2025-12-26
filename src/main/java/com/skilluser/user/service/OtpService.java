@@ -9,10 +9,10 @@ public interface OtpService {
 //
 //    public boolean validateOtp(User user, String inputOtp);
 
-    public Otp generateOtp(User user);
+    Otp generateOtp(User user);
 
-   public boolean validateOtp(User user, String inputOtp);
+   boolean validateOtp(User user, String inputOtp);
 
-    public void sendVerificationEmail(String toEmail, String subject, String content);
+    void sendVerificationEmail(String toEmail, String subject, String content);
 
 }

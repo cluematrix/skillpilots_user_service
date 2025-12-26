@@ -13,15 +13,15 @@ import java.util.Map;
 
 public interface PsychometricService {
 
-    public PsychometricTest createTest(PsychometricTest psychometricTest);
+    PsychometricTest createTest(PsychometricTest psychometricTest);
 
     Map<String, Object> getTests(Pageable pageable);
 
-    public void addQuestions(AddQuestionsRequest req);
+    void addQuestions(AddQuestionsRequest req);
 
-    public StartTestResponse startTest(StartTestRequest req);
+    StartTestResponse startTest(StartTestRequest req);
 
-    public Map<String, Object> submitTest(Long attemptId, Long userId, List<AnswerDto> answers);
+    Map<String, Object> submitTest(Long attemptId, Long userId, List<AnswerDto> answers);
 
-    public List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException;
+    List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException;
 }

@@ -129,7 +129,7 @@ public class PsychometricServiceImpl implements PsychometricService {
             Long userId,
             List<AnswerDto> answers) {
 
-        // 1️⃣ Attempt
+        // Attempt
         PsychometricAttempt attempt = attemptRepository.findById(attemptId)
                 .orElseThrow(() -> new RuntimeException("Attempt not found"));
 
@@ -137,7 +137,7 @@ public class PsychometricServiceImpl implements PsychometricService {
             throw new RuntimeException("Test already submitted");
         }
 
-        // 2️⃣ Save answers
+        // Save answers
         for (AnswerDto a : answers) {
 
             PsychometricQuestion question =
@@ -153,18 +153,18 @@ public class PsychometricServiceImpl implements PsychometricService {
             answerRepository.save(ans);
         }
 
-        // 3️⃣ Mark submitted
+        // mark submitted
         attempt.setSubmitted(true);
         attemptRepository.save(attempt);
 
-        // 4️⃣ Fetch saved answers
+        //  Fetch saved answers
         List<PsychometricAnswer> savedAnswers =
                 answerRepository.findByAttemptId(attempt.getId());
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔥 BUILD ATTEMPT PAYLOAD ONCE (NEVER NULL)
+        //  BUILD ATTEMPT PAYLOAD ONCE (NEVER NULL)
         AttemptPayload attemptPayload = new AttemptPayload();
         attemptPayload.setId(attempt.getId());
         attemptPayload.setUserId(user.getId());
@@ -174,14 +174,14 @@ public class PsychometricServiceImpl implements PsychometricService {
                         .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         );
 
-        // 5️⃣ BUILD AI ANSWERS
+        //  BUILD AI ANSWERS
         List<AiAnswerPayload> aiAnswers = new ArrayList<>();
 
         for (PsychometricAnswer a : savedAnswers) {
 
             AiAnswerPayload p = new AiAnswerPayload();
             p.setId(a.getId());
-            p.setAttempt(attemptPayload);   // 🔥 NEVER NULL
+            p.setAttempt(attemptPayload);
 
             QuestionPayload q = new QuestionPayload();
             q.setId(String.valueOf(a.getQuestion().getId()));
@@ -207,7 +207,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to convert AI response to JSON", e);
         }
-        Object summary = aiClient.callAiAnalysis(aiPayload);
+      //  Object summary = aiClient.callAiAnalysis(aiPayload);
 
         PsychometricResult result = new PsychometricResult();
         result.setAttempt(attempt);
@@ -218,7 +218,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", user.getId());
         map.put("username", user.getName());
-        map.put("summary", summary);
+        map.put("summary", aiSummaryJson);
 
         return map;
     }
