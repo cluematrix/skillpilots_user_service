@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class ChatMemory {
 
-    private Map<String, List<LiveChatMessage>> roomMessages = new ConcurrentHashMap<>();
+    private final Map<String, List<LiveChatMessage>> roomMessages = new ConcurrentHashMap<>();
 
 
 
