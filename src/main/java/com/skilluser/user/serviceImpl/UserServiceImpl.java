@@ -1,14 +1,11 @@
 package com.skilluser.user.serviceImpl;
 
-import com.skilluser.user.model.Role;
-import com.skilluser.user.model.User;
-import com.skilluser.user.repository.RoleRepository;
+import com.skilluser.user.model.*;
+import com.skilluser.user.repository.*;
 
 
 import com.skilluser.user.model.User;
-import com.skilluser.user.repository.OtpRepository;
 
-import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -33,6 +24,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PaymentHistoryRepo paymentHistoryRepo;
+    @Autowired private PaymentStatusRepo paymentStatusRepo;
 
     @Autowired
     private OtpService otpService;
@@ -138,7 +132,63 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
     }
 
+    @Override
+    public Map<String, Object> checkPayment(Long userId) {
 
+        Map<String, Object> response = new HashMap<>();
+
+        // 🔹 Fetch User
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        boolean hasPaid = false;
+        String role = user.getRoles().getName(); // INT_STUDENT / EXT_STUDENT
+
+        // ================= INTERNAL STUDENT =================
+        if ("INT_STUDENT".equalsIgnoreCase(role)) {
+
+            PaymentStatus paymentStatus =
+                    paymentStatusRepo.findByCollegeId((long) user.getCollegeId());
+
+            if (paymentStatus != null
+                    && "PAID".equalsIgnoreCase(paymentStatus.getStatus())) {
+
+                // ✅ College has paid → student auto paid
+                hasPaid = true;
+
+            } else {
+                // ❌ College not paid → check student payment
+                PaymentHistory payment =
+                        paymentHistoryRepo.findTopByUserIdAndStatusOrderByPaymentDateDesc(
+                                userId, "SUCCESS"
+                        );
+                hasPaid = (payment != null);
+            }
+        }
+
+        // ================= EXTERNAL STUDENT =================
+        else if ("EXT_STUDENT".equalsIgnoreCase(role)) {
+
+            PaymentHistory payment =
+                    paymentHistoryRepo.findTopByUserIdAndStatusOrderByPaymentDateDesc(
+                            userId, "SUCCESS"
+                    );
+
+            hasPaid = (payment != null);
+        }
+
+        // ================= RESPONSE =================
+        if (!hasPaid) {
+            response.put("status", "payment_required");
+            response.put("message", "Payment required before applying");
+            response.put("hasPaid", false);
+            return response;
+        }
+
+        response.put("status", "success");
+        response.put("hasPaid", true);
+        return response;
+    }
 
     public String generateOTP()
     {
