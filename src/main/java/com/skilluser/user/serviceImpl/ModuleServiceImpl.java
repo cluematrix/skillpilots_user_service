@@ -8,6 +8,7 @@ import com.skilluser.user.model.*;
 import com.skilluser.user.model.Module;
 import com.skilluser.user.repository.*;
 import com.skilluser.user.service.ModuleService;
+import com.skilluser.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class ModuleServiceImpl implements ModuleService {
     private final ModulePermissionRepository modulePermissionRepository;
     private final CustomRoleRepository customRoleRepository;
     private final CustomRolePermissionRepo customRolePermissionRepo;
+    private final UserService userService;
 
     @Override
     public Module createModule(Module module) {
@@ -278,6 +280,8 @@ public class ModuleServiceImpl implements ModuleService {
             response.put("roleType", "PREDEFINED");
             response.put("roleName", user.getRoles().getName());
             response.put("permissions", permsList);
+            Map<String, Object> map = userService.checkPayment(userId);
+            response.put("payment",map);
 
 //        } else if (user.getCustomRole() != null) { // Custom role
 //            List<CustomRolePermission> permissions =
