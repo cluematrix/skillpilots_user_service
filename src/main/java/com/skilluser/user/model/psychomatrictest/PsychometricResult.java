@@ -26,6 +26,8 @@ public class PsychometricResult {
     private String aiSummary;
     private Long userId;
 
+
+
     @CurrentTimestamp
     private LocalDateTime generatedAt;
 }

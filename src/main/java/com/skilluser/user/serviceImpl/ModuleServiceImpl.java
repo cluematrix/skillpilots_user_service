@@ -25,7 +25,7 @@ public class ModuleServiceImpl implements ModuleService {
     private final CustomRoleRepository customRoleRepository;
     private final CustomRolePermissionRepo customRolePermissionRepo;
     private final UserService userService;
-
+    private final  PsychometricResultRepository  psychometricResultRepository;
     @Override
     public Module createModule(Module module) {
         return moduleRepository.save(module);
@@ -283,6 +283,7 @@ public class ModuleServiceImpl implements ModuleService {
             Map<String, Object> map = userService.checkPayment(userId);
             response.put("payment",map);
             response.put("plan",userService.getPlanAmount(userId));
+            response.put("test_given",psychometricResultRepository.existsByUserId(userId));
 
 //        } else if (user.getCustomRole() != null) { // Custom role
 //            List<CustomRolePermission> permissions =
