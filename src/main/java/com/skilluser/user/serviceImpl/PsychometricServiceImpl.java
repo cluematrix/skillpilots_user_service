@@ -216,7 +216,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", user.getId());
         map.put("username", user.getName());
-        map.put("summary", aiSummaryJson);
+        map.put("summary", aiResponseObject);
 
         return map;
     }
