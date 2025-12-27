@@ -33,37 +33,28 @@ public class PsychometricController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getTest(@RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size
-            ,                        @RequestParam(defaultValue = "id") String sortBy,
-                                     @RequestParam(defaultValue = "desc") String direction) {
+    public ResponseEntity<?> getTest(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "desc") String direction) {
         Pageable pageRequest = PaginationUtil.createPageRequest(page, size, sortBy, direction);
 
         return ResponseEntity.ok(psychometricService.getTests(pageRequest));
     }
+
     @PostMapping("/questions")
-    public ResponseEntity<?> addMultipleQuestions(
-            @RequestBody AddQuestionsRequest request) {
+    public ResponseEntity<?> addMultipleQuestions(@RequestBody AddQuestionsRequest request) {
 
         psychometricService.addQuestions(request);
         return ResponseEntity.ok("Questions added successfully");
     }
 
     @PostMapping("/start")
-    public StartTestResponse
-    startTest(@RequestBody StartTestRequest req) {
+    public StartTestResponse startTest(@RequestBody StartTestRequest req) {
         return psychometricService.startTest(req);
     }
 
 
     @PostMapping("/submit/{attemptId}/{userId}")
-    public ResponseEntity<?> submitTest(
-            @PathVariable Long attemptId,
-            @PathVariable Long userId,
-            @RequestBody List<AnswerDto> answers
-    ) {
-        Map<String, Object> result =
-                psychometricService.submitTest(attemptId, userId, answers);
+    public ResponseEntity<?> submitTest(@PathVariable Long attemptId, @PathVariable Long userId, @RequestBody List<AnswerDto> answers) {
+        Map<String, Object> result = psychometricService.submitTest(attemptId, userId, answers);
 
         return ResponseEntity.ok(result);
     }
@@ -74,12 +65,8 @@ public class PsychometricController {
     }
 
     @GetMapping("/responses/{userId}")
-    public ResponseEntity<?> getResponsesByUserId(
-            @PathVariable Long userId
-    ) {
-        return ResponseEntity.ok(
-                psychometricService.getResponsesByUserId(userId)
-        );
+    public ResponseEntity<?> getResponsesByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(psychometricService.getResponsesByUserId(userId));
     }
 
 }
