@@ -72,4 +72,14 @@ public class PsychometricController {
     public ResponseEntity<?> getSummary(@PathVariable Long userId) throws JsonProcessingException {
         return ResponseEntity.ok(psychometricService.getSummary(userId));
     }
+
+    @GetMapping("/responses/{userId}")
+    public ResponseEntity<?> getResponsesByUserId(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(
+                psychometricService.getResponsesByUserId(userId)
+        );
+    }
+
 }
