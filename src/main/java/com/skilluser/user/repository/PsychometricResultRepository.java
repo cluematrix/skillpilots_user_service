@@ -8,4 +8,6 @@ import java.util.List;
 public interface PsychometricResultRepository extends JpaRepository<PsychometricResult,Long> {
 
     List<PsychometricResult> findByUserIdOrderByGeneratedAtDesc(Long userId);
+    boolean existsByUserId(Long userId);
+
 }
