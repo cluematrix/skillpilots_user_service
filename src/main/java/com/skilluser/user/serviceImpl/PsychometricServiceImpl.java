@@ -3,10 +3,7 @@ package com.skilluser.user.serviceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skilluser.user.dto.*;
-import com.skilluser.user.dto.ai.AiAnalysisPayload;
-import com.skilluser.user.dto.ai.AiAnswerPayload;
-import com.skilluser.user.dto.ai.AttemptPayload;
-import com.skilluser.user.dto.ai.QuestionPayload;
+import com.skilluser.user.dto.ai.*;
 import com.skilluser.user.enums.QuestionType;
 import com.skilluser.user.enums.TestSection;
 import com.skilluser.user.model.User;
@@ -207,6 +204,7 @@ public class PsychometricServiceImpl implements PsychometricService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to convert AI response to JSON", e);
         }
+
       //  Object summary = aiClient.callAiAnalysis(aiPayload);
 
         PsychometricResult result = new PsychometricResult();
@@ -239,6 +237,58 @@ public class PsychometricServiceImpl implements PsychometricService {
 
         return summaries;
     }
+
+    @Override
+
+    public UserWiseResponseDto getResponsesByUserId(Long userId) {
+
+        List<PsychometricAttempt> attempts =
+                attemptRepository
+                        .findByUserIdAndSubmittedTrueOrderByStartedAtDesc(userId);
+
+        List<AttemptResponseDto> attemptResponses = new ArrayList<>();
+
+        for (PsychometricAttempt attempt : attempts) {
+
+            List<PsychometricAnswer> answers =
+                    answerRepository.findByAttemptId(attempt.getId());
+
+            List<UserAnswerResponseDto> responses = new ArrayList<>();
+
+            for (PsychometricAnswer a : answers) {
+
+                String answerText =
+                        a.getDescriptiveAnswer() != null
+                                ? a.getDescriptiveAnswer()
+                                : a.getSelectedAnswer();
+
+                responses.add(
+                        new UserAnswerResponseDto(
+                                a.getQuestion().getId(),
+                                a.getQuestion().getQuestionText(),
+                                answerText
+                        )
+                );
+            }
+
+            AttemptResponseDto attemptDto = new AttemptResponseDto();
+            attemptDto.setAttemptId(attempt.getId());
+            attemptDto.setSubmittedAt(
+                    attempt.getStartedAt()
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            );
+            attemptDto.setResponses(responses);
+
+            attemptResponses.add(attemptDto);
+        }
+
+        UserWiseResponseDto result = new UserWiseResponseDto();
+        result.setUserId(userId);
+        result.setAttempts(attemptResponses);
+
+        return result;
+    }
+
 
 
     private QuestionDto mapToDto(PsychometricQuestion q) {
