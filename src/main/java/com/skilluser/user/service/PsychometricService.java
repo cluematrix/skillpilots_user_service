@@ -16,7 +16,7 @@ public interface PsychometricService {
 
     PsychometricTest createTest(PsychometricTest psychometricTest);
 
-    Map<String, Object> getTests(Pageable pageable);
+    Map<String, Object> getTests(Pageable pageable,Long userId);
 
     void addQuestions(AddQuestionsRequest req);
 
@@ -27,4 +27,6 @@ public interface PsychometricService {
     List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException;
 
     public UserWiseResponseDto getResponsesByUserId(Long userId);
+
+    public boolean canUserGivePsychometricTest(Long userId);
 }
