@@ -230,7 +230,7 @@ public class LoginController {
 
         Integer totalExperienceYears = studentEmploymentClient.getTotalExperience(userId);
 
-        Map<String, Object> userMap = new HashMap<>(claims);
+        Map<String, Object> userMap = new HashMap<>(claims);    
         userMap.put("name", username);
         userMap.put("experience", totalExperienceYears);
 
