@@ -32,11 +32,20 @@ public class PsychometricController {
         return ResponseEntity.ok(psychometricService.createTest(psychometricTest));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getTest(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "desc") String direction) {
-        Pageable pageRequest = PaginationUtil.createPageRequest(page, size, sortBy, direction);
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getTest(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Pageable pageRequest =
+                PaginationUtil.createPageRequest(page, size, sortBy, direction);
 
-        return ResponseEntity.ok(psychometricService.getTests(pageRequest));
+        return ResponseEntity.ok(
+                psychometricService.getTests(pageRequest, userId)
+        );
     }
 
     @PostMapping("/questions")

@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -43,10 +45,42 @@ public class PsychometricServiceImpl implements PsychometricService {
     }
 
     @Override
-    public Map<String, Object> getTests(Pageable pageable) {
-        Page<PsychometricTest> testPage = psychometricTestRepository.findAll(pageable);
-        return PaginationUtil.buildResponse(testPage);
+    public Map<String, Object> getTests(Pageable pageable,Long userId) {
+        Page<PsychometricTest> testPage =
+                psychometricTestRepository.findAll(pageable);
+
+        Map<String, Object> response =
+                PaginationUtil.buildResponse(testPage);
+
+        Optional<PsychometricAttempt> lastAttemptOpt =
+                attemptRepository
+                        .findTopByUserIdAndSubmittedTrueOrderByStartedAtDesc(userId);
+
+        boolean canGiveTest = true;
+        LocalDate nextAllowedDate = null;
+
+        if (lastAttemptOpt.isPresent()) {
+            LocalDateTime lastSubmittedAt =
+                    lastAttemptOpt.get().getStartedAt();
+
+            LocalDateTime nextAllowedAt =
+                    lastSubmittedAt.plusMonths(3);
+
+            if (LocalDateTime.now().isBefore(nextAllowedAt)) {
+                canGiveTest = false;
+                nextAllowedDate = nextAllowedAt.toLocalDate();
+            }
+        }
+
+        response.put("canGivePsychometricTest", canGiveTest);
+
+        if (!canGiveTest) {
+            response.put("nextTestAllowedAt", nextAllowedDate);
+        }
+
+        return response;
     }
+
 
     @Transactional
     @Override
@@ -289,6 +323,26 @@ public class PsychometricServiceImpl implements PsychometricService {
         return result;
     }
 
+    @Override
+    public boolean canUserGivePsychometricTest(Long userId) {
+
+        Optional<PsychometricAttempt> lastAttemptOpt =
+                attemptRepository
+                        .findTopByUserIdAndSubmittedTrueOrderByStartedAtDesc(userId);
+
+        // First time user → allow
+        if (lastAttemptOpt.isEmpty()) {
+            return true;
+        }
+
+        LocalDateTime lastSubmittedAt =
+                lastAttemptOpt.get().getStartedAt();
+
+        LocalDateTime nextAllowedAt =
+                lastSubmittedAt.plusMonths(3);
+
+        return LocalDateTime.now().isAfter(nextAllowedAt);
+    }
 
 
     private QuestionDto mapToDto(PsychometricQuestion q) {
