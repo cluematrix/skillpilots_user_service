@@ -143,7 +143,7 @@ public class LoginController {
     }
 
     // decode token shrunkhal 26/sept
-    /*@GetMapping("/me")
+    @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -186,10 +186,10 @@ public class LoginController {
                 "permission",permissionsForUser,
                 "name",username
         ));
-    }*/
+    }
 
 
-    @GetMapping("/me")
+   /* @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request)
     {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -240,6 +240,6 @@ public class LoginController {
                 "permission",permissionsForUser,
                 "name",username
         ));
-    }
+    }*/
 
 }
