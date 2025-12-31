@@ -256,6 +256,7 @@ public class PsychometricServiceImpl implements PsychometricService {
     }
 
     @Override
+
     public List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException {
 
         List<PsychometricResult> results =
@@ -264,13 +265,21 @@ public class PsychometricServiceImpl implements PsychometricService {
         List<Map<String, Object>> summaries = new ArrayList<>();
 
         for (PsychometricResult r : results) {
-            summaries.add(
-                    objectMapper.readValue(r.getAiSummary(), Map.class)
-            );
+
+            // Parse AI summary JSON
+            Map<String, Object> summary =
+                    objectMapper.readValue(r.getAiSummary(), Map.class);
+
+            summary.put("generatedAt", r.getGeneratedAt());
+
+            summary.put("resultId", r.getId());
+
+            summaries.add(summary);
         }
 
         return summaries;
     }
+
 
     @Override
 
@@ -343,6 +352,29 @@ public class PsychometricServiceImpl implements PsychometricService {
 
         return LocalDateTime.now().isAfter(nextAllowedAt);
     }
+
+    @Override
+
+    public Map<String, Object> getLatestSummary(Long id)
+            throws JsonProcessingException {
+
+        PsychometricResult result = psychometricResultRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Assessment not found with id: " + id));
+
+        // Parse AI summary JSON
+        Map<String, Object> summary =
+                objectMapper.readValue(result.getAiSummary(), Map.class);
+
+        // Add meta fields
+        summary.put("assessmentId", result.getId());
+        summary.put("generatedAt", result.getGeneratedAt());
+
+
+
+
+        return summary;
+    }
+
 
 
     private QuestionDto mapToDto(PsychometricQuestion q) {
