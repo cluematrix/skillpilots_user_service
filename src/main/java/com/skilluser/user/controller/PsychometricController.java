@@ -78,4 +78,11 @@ public class PsychometricController {
         return ResponseEntity.ok(psychometricService.getResponsesByUserId(userId));
     }
 
+    @GetMapping("/latest/{userId}")
+    public ResponseEntity<Map<String, Object>> getLatest(@PathVariable Long userId)
+            throws JsonProcessingException {
+
+        return ResponseEntity.ok(psychometricService.getLatestSummary(userId));
+    }
+
 }
