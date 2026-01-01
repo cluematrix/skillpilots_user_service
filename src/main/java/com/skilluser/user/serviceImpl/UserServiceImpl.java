@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 // ❌ College not paid → check student payment
                 PaymentHistory payment =
                         paymentHistoryRepo.findTopByUserIdAndStatusOrderByPaymentDateDesc(
-                                userId, "SUCCESS"
+                                userId, "CHARGED"
                         );
                 hasPaid = (payment != null);
             }
@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
             PaymentHistory payment =
                     paymentHistoryRepo.findTopByUserIdAndStatusOrderByPaymentDateDesc(
-                            userId, "SUCCESS"
+                            userId, "CHARGED"
                     );
 
             hasPaid = (payment != null);
