@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.skilluser.user.dto.LoginResponse;
+import com.skilluser.user.fiegnclient.StudentEmploymentClient;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.ModuleService;
@@ -48,6 +49,8 @@ public class LoginController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ModuleService moduleService;
+    @Autowired
+    private StudentEmploymentClient studentEmploymentClient;
 
 
     @PostMapping("/login")
@@ -184,5 +187,59 @@ public class LoginController {
                 "name",username
         ));
     }
+
+
+   /* @GetMapping("/me")
+    public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request)
+    {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "valid", false,
+                    "message", "Missing or invalid Authorization header"
+            ));
+        }
+
+        // Extract token from header
+        String token = authHeader.substring(7);
+
+        if (token.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "valid", false,
+                    "message", "Token is empty"
+            ));
+        }
+
+        // Validate token
+        if (!jwtUtils.isValidToken(token)) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "valid", false,
+                    "message", "Token is invalid or expired"
+            ));
+        }
+
+        // Decode token
+        Claims claims = jwtUtils.decodeToken(token);
+        Long userId = claims.get("userId",Long.class);
+        claims.get("deptId", Long.class);
+
+        String username = userRepository.findById(userId).map(User::getName).get();
+        // fetch permission
+        Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
+
+        Integer totalExperienceYears = studentEmploymentClient.getTotalExperience(userId);
+
+        Map<String, Object> userMap = new HashMap<>(claims);    
+        userMap.put("name", username);
+        userMap.put("experience", totalExperienceYears);
+
+        return ResponseEntity.ok(Map.of(
+                "valid", true,
+                "user", userMap,
+                "permission",permissionsForUser,
+                "name",username
+        ));
+    }*/
 
 }
