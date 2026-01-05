@@ -83,6 +83,7 @@ public class PsychometricController {
             throws JsonProcessingException {
 
         return ResponseEntity.ok(psychometricService.getLatestSummary(userId));
+
     }
 
 }
