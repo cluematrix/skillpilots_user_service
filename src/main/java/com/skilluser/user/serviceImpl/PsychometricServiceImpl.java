@@ -256,7 +256,6 @@ public class PsychometricServiceImpl implements PsychometricService {
     }
 
     @Override
-
     public List<Map<String, Object>> getSummary(Long userId) throws JsonProcessingException {
 
         List<PsychometricResult> results =
@@ -275,6 +274,9 @@ public class PsychometricServiceImpl implements PsychometricService {
             summary.put("resultId", r.getId());
 
             summaries.add(summary);
+            summaries.add(
+                    objectMapper.readValue(r.getAiSummary(), Map.class)
+            );
         }
 
         return summaries;

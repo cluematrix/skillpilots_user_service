@@ -9,14 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
-@EnableWebSecurity
-@Slf4j
+//@Configuration
+//@EnableWebSecurity
+//@Slf4j
 public class SecurityConfig
 {
 //    @Autowired
 //    private OAuth2SuccessHandler oAuth2SuccessHandler;
-
+//
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //

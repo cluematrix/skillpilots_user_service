@@ -1,11 +1,14 @@
 package com.skilluser.user.controller;
 
+import com.skilluser.user.dto.DomainDto;
 import com.skilluser.user.model.Domain;
 import com.skilluser.user.service.DomainService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -26,4 +29,11 @@ public class DomainController
     {
         return ResponseEntity.status(HttpStatus.OK).body(domainService.getDomains());
     }
+
+
+    @GetMapping("/dto")   // Ashvin 5-01-26 get domain in Dto responce
+    public ResponseEntity<List<DomainDto>> getDomainsDto() {
+        return ResponseEntity.ok(domainService.getDomainsDto());
+    }
+
 }

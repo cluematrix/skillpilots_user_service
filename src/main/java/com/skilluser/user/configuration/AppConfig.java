@@ -1,6 +1,7 @@
 package com.skilluser.user.configuration;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,11 +11,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizationSuccessHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -102,8 +105,16 @@ public class AppConfig {
 }*/
 
 @Configuration
+@EnableWebSecurity
+@Slf4j
 public class AppConfig {
 
+//    @Autowired
+//    private OAuth2SuccessHandler oAuth2SuccessHandler;
+    @Autowired
+    private JwtFilter jwtFilter;
+
+    // old method for backup
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter,
                                                    AuthenticationProvider authenticationProvider) throws Exception {
@@ -133,6 +144,9 @@ public class AppConfig {
 
         return http.build();
     }
+
+
+
 
     @Bean
     public AuthenticationProvider authenticationProvider(UserServiceImpl userService,
