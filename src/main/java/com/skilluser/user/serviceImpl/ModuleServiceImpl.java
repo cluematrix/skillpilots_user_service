@@ -8,6 +8,7 @@ import com.skilluser.user.model.*;
 import com.skilluser.user.model.Module;
 import com.skilluser.user.repository.*;
 import com.skilluser.user.service.ModuleService;
+import com.skilluser.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,8 @@ public class ModuleServiceImpl implements ModuleService {
     private final ModulePermissionRepository modulePermissionRepository;
     private final CustomRoleRepository customRoleRepository;
     private final CustomRolePermissionRepo customRolePermissionRepo;
-
+    private final UserService userService;
+    private final  PsychometricResultRepository  psychometricResultRepository;
     @Override
     public Module createModule(Module module) {
         return moduleRepository.save(module);
@@ -237,7 +239,7 @@ public class ModuleServiceImpl implements ModuleService {
 
         if (user.getRoles() != null) { // Predefined role
             Long roleId = user.getRoles().getId();
-            long id = (long) user.getCollegeId();  // int → Long
+            long id = user.getCollegeId();  // int → Long
 
             Long collegeId = user.getCollegeId() != 0 ? id : null;
             Long companyId = user.getCompanyId() != null ? user.getCompanyId() : null;
@@ -278,6 +280,10 @@ public class ModuleServiceImpl implements ModuleService {
             response.put("roleType", "PREDEFINED");
             response.put("roleName", user.getRoles().getName());
             response.put("permissions", permsList);
+            Map<String, Object> map = userService.checkPayment(userId);
+            response.put("payment",map);
+            response.put("plan",userService.getPlanAmount(userId));
+            response.put("test_given",psychometricResultRepository.existsByUserId(userId));
 
 //        } else if (user.getCustomRole() != null) { // Custom role
 //            List<CustomRolePermission> permissions =

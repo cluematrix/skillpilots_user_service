@@ -86,7 +86,7 @@ public class ChatController {
 
         // Send last messages in memory to new user
         List<LiveChatMessage> lastMessages = chatMemory.getMessages(room);
-        ((List<?>) lastMessages).forEach(msg -> messagingTemplate.convertAndSendToUser(
+        lastMessages.forEach(msg -> messagingTemplate.convertAndSendToUser(
                 message.getSenderId(), "/queue/messages", msg
         ));
     }

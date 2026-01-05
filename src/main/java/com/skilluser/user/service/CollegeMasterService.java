@@ -10,10 +10,10 @@ import java.util.Map;
 
 public interface CollegeMasterService
 {
-    public CollegeResponseDTO saveCollege(CollegeRequestDTO dto);
-    public CollegeResponseDTO updateCollege(CollegeRequestDTO collegeRequestDTO);
-    public List<CollegeResponseDTO> getAllColleges();
-    public List<CollegeResponseDTO> getCollegesByState(Long stateId);
-    public List<CollegeResponseDTO> getCollegesByUniversity(Long universityId);
-    public Map<String, Object> uploadMasterData(MultipartFile file);
+    CollegeResponseDTO saveCollege(CollegeRequestDTO dto);
+    CollegeResponseDTO updateCollege(CollegeRequestDTO collegeRequestDTO);
+    List<CollegeResponseDTO> getAllColleges();
+    List<CollegeResponseDTO> getCollegesByState(Long stateId);
+    List<CollegeResponseDTO> getCollegesByUniversity(Long universityId);
+    Map<String, Object> uploadMasterData(MultipartFile file);
 }

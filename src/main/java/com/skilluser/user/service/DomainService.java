@@ -11,4 +11,6 @@ public interface DomainService {
     public List<Domain> getDomains();
 
     List<DomainDto> getDomainsDto();
+
+
 }

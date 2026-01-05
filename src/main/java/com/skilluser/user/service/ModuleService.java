@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Map;
 
 public interface ModuleService {
-    public Module createModule(Module module);
+    Module createModule(Module module);
 
-    public ModulePermission findByName(String name);
-    public List<ModulePermissionDTO> addModulePermissions(ModulePermissionBulkDTO request);
-    public List<ModulePermission> saveOrUpdatePermissions(Long roleId,
-                                                          Long collegeId,
-                                                          Long companyId,
-                                                          List<ModulePermissionDTO> permissionDTOs);
+    ModulePermission findByName(String name);
+    List<ModulePermissionDTO> addModulePermissions(ModulePermissionBulkDTO request);
+    List<ModulePermission> saveOrUpdatePermissions(Long roleId,
+                                                   Long collegeId,
+                                                   Long companyId,
+                                                   List<ModulePermissionDTO> permissionDTOs);
     List<ModulePermissionGet> getModulePermission(Long userId);
 
-    public List<ModulePermission> getPermissionsForRole(Long roleId, Long collegeId, Long companyId);
+    List<ModulePermission> getPermissionsForRole(Long roleId, Long collegeId, Long companyId);
 
-    public void setPermissions(Long roleId, Long collegeId, Long companyId, List<PermissionRequest> permissions) ;
+    void setPermissions(Long roleId, Long collegeId, Long companyId, List<PermissionRequest> permissions) ;
 
-    public Map<String, Object> getPermissionsForUser(Long userId) ;
+    Map<String, Object> getPermissionsForUser(Long userId) ;
     }

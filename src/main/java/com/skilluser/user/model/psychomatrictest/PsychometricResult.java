@@ -24,6 +24,9 @@ public class PsychometricResult {
 
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
+    private Long userId;
+    @Column(columnDefinition = "TEXT")
+    private String ansSaved;
 
     @CurrentTimestamp
     private LocalDateTime generatedAt;
