@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 public class DomainDto {
 
     private Long mainDomainId;   // mapped from Domain.id
-    private String name;
+    private String mainDomainName;
     private LocalDateTime createdAt;
 }

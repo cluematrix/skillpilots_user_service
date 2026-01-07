@@ -42,7 +42,7 @@ public class DomainServiceImpl implements DomainService {
                 .map(domain -> {
                     DomainDto dto = new DomainDto();
                     dto.setMainDomainId(domain.getId());
-                    dto.setName(domain.getName());
+                    dto.setMainDomainName(domain.getName());
                     dto.setCreatedAt(domain.getCreatedAt());
                     return dto;
                 })
