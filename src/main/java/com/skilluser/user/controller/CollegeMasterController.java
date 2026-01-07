@@ -240,14 +240,17 @@ public class CollegeMasterController {
     // Get College by university
     @GetMapping("/collegeUniversity/{universityId}")
     public ResponseEntity<?> getCollegesByUniversity(@PathVariable Long universityId) {
-        try {
+        try
+        {
             List<CollegeResponseDTO> colleges =
                     collegeMasterService.getCollegesByUniversity(universityId);
             return ResponseEntity.ok(Map.of(
                     "message", "Colleges fetched successfully!",
                     "data", colleges
             ));
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
