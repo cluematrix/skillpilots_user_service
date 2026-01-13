@@ -1,5 +1,6 @@
 package com.skilluser.user.serviceImpl;
 
+import com.skilluser.user.dto.CollegeList;
 import com.skilluser.user.dto.CollegeRequestDTO;
 import com.skilluser.user.dto.CollegeResponseDTO;
 import com.skilluser.user.model.*;
@@ -285,4 +286,23 @@ public class CollegeMasterServiceImpl implements CollegeMasterService
         DataFormatter formatter = new DataFormatter();
         return formatter.formatCellValue(cell).trim();
     }
+
+
+    @Override
+    public List<CollegeList> getCollegeListByUniversity(Long universityId)
+    {
+        List<CollegeMaster> colleges =
+                collegeRepo
+                        .findByUniversity_UniversityId(universityId);
+
+        return colleges.stream()
+                .map(college -> new CollegeList(
+                        college.getCollegeId(),
+                        college.getCollegeName(),
+                        college.getType(),
+                        college.getIsRegistered()
+                ))
+                .toList();
+    }
+
 }
