@@ -9,4 +9,5 @@ import java.util.List;
 public interface CollegeMasterRepository extends JpaRepository<CollegeMaster,Long> {
     List<CollegeMaster> findByState_StateId(Long stateId);
     List<CollegeMaster> findByUniversity_UniversityId(Long universityId);
+
 }

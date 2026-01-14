@@ -1,5 +1,6 @@
 package com.skilluser.user.service;
 
+import com.skilluser.user.dto.CollegeList;
 import com.skilluser.user.dto.CollegeRequestDTO;
 import com.skilluser.user.dto.CollegeResponseDTO;
 import com.skilluser.user.model.CollegeMaster;
@@ -16,4 +17,5 @@ public interface CollegeMasterService
     List<CollegeResponseDTO> getCollegesByState(Long stateId);
     List<CollegeResponseDTO> getCollegesByUniversity(Long universityId);
     Map<String, Object> uploadMasterData(MultipartFile file);
+    public List<CollegeList> getCollegeListByUniversity(Long universityId);
 }
