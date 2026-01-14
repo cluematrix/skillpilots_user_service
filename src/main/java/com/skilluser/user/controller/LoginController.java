@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.fiegnclient.StudentEmploymentClient;
+import com.skilluser.user.model.ContactRequest;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.ModuleService;
+import com.skilluser.user.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,8 @@ public class LoginController {
     private ModuleService moduleService;
     @Autowired
     private StudentEmploymentClient studentEmploymentClient;
+    @Autowired
+    private UserService userService;
 
 
     @PostMapping("/login")
@@ -192,8 +196,11 @@ public class LoginController {
                 "name",username
         ));
     }
-
-
+    @PostMapping("/contact")
+    public ResponseEntity<?> sendMessage( @RequestBody ContactRequest request) {
+        userService.processContact(request);
+        return ResponseEntity.ok("Message sent successfully");
+    }
    /* @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request)
     {

@@ -8,7 +8,10 @@ import com.skilluser.user.model.User;
 
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +22,7 @@ import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
+    private static final String SUPPORT_EMAIL = "support@skillpilots.com";
 
     @Autowired
     private UserRepository userRepository;
@@ -26,12 +30,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private PaymentHistoryRepo paymentHistoryRepo;
-    @Autowired private PaymentStatusRepo paymentStatusRepo;
+    @Autowired
+    private PaymentStatusRepo paymentStatusRepo;
     @Autowired
     private PlanDetailsRepository planDetailsRepository;
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Autowired
+    private ContactRepository contactRepository;
+
 
     @Autowired
     private OtpService otpService;
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -46,24 +57,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new UsernameNotFoundException("User Not Found "+ id));
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found " + id));
     }
-
 
 
     @Override
     public List<User> findUsersByRoleAndDepartment(Long roleId, Long departmentId) {
-        return userRepository.findUsersByRoleAndDepartment(roleId,departmentId);
+        return userRepository.findUsersByRoleAndDepartment(roleId, departmentId);
     }
 
     @Override
     public List<User> findUsersByRoles_IdAndCollegeId(Long roleId, Long collegeId) {
-        return userRepository.findUsersByRoles_IdAndCollegeId(roleId,collegeId);
+        return userRepository.findUsersByRoles_IdAndCollegeId(roleId, collegeId);
     }
 
     @Override
     public List<User> findHodByDepartment(Long roleId, Long departmentId) {
-        return userRepository.findHodByDepartment(roleId,departmentId);
+        return userRepository.findHodByDepartment(roleId, departmentId);
     }
 
     @Override
@@ -72,17 +82,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean changePassword(Long userId, String oldPassword, String newPassword)
-    {
+    public boolean changePassword(Long userId, String oldPassword, String newPassword) {
         Optional<User> exist = userRepository.findById(userId);
-        if (exist.isEmpty())
-        {
+        if (exist.isEmpty()) {
             return false;
         }
-      User user=  exist.get();
+        User user = exist.get();
         boolean passwordMatches = passwordEncoder.matches(oldPassword, user.getPassword());
-        if (!passwordMatches)
-        {
+        if (!passwordMatches) {
             return false;
         }
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -90,7 +97,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(user);
         return true;
     }
-
 
 
     @Override
@@ -193,7 +199,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Map<String, Object> getPlanAmount(Long userId){
+    public Map<String, Object> getPlanAmount(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
@@ -210,7 +216,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         //  INTERNAL
         else if ("INT_STUDENT".equalsIgnoreCase(role)) {
-             Long collegeId =(long)user.getCollegeId();
+            Long collegeId = (long) user.getCollegeId();
             plan = planDetailsRepository.findByCollegeId(collegeId).orElse(null);
 
             // fallback to BASIC
@@ -231,9 +237,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
+    @Override
+    @Transactional
+    public void processContact(ContactRequest req) {
+        contactRepository.save(req);
+        sendMailToSupport(req);
+        sendConfirmationToUser(req);
 
-    public String generateOTP()
-    {
+    }
+
+    private void sendMailToSupport(ContactRequest req) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(SUPPORT_EMAIL);
+        message.setSubject("New Contact Form: " + req.getType());
+
+        message.setText(
+                "Name: " + req.getFullName() + "\n" +
+                        "Email: " + req.getEmail() + "\n" +
+                        "Contact: " + req.getContactNumber() + "\n" +
+                        "Designation: " + req.getDesignation() + "\n" +
+                        "Type: " + req.getType() + "\n\n" +
+                        "Message:\n" + req.getComment()
+        );
+
+        javaMailSender.send(message);
+    }
+
+    private void sendConfirmationToUser(ContactRequest req) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(req.getEmail());
+        message.setSubject("We received your message");
+
+        message.setText(
+                "Hi " + req.getFullName() + ",\n\n" +
+                        "Thanks for contacting us. Our team will reach out to you shortly.\n\n" +
+                        "Regards,\nSupport Team"
+        );
+
+        javaMailSender.send(message);
+    }
+
+    public String generateOTP() {
         Random random = new Random();
         int otp = 1000 + random.nextInt(9000);
         return String.valueOf(otp);
