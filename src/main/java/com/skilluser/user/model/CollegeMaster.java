@@ -45,4 +45,7 @@ public class CollegeMaster {
 
     @Column(name = "status", columnDefinition = "VARCHAR(50) DEFAULT 'Active'")
     private String status;
+
+    @Column(name = "is_registered", nullable = false)
+    private Boolean isRegistered = false;
 }

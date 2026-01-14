@@ -265,18 +265,13 @@ public class PsychometricServiceImpl implements PsychometricService {
 
         for (PsychometricResult r : results) {
 
-            // Parse AI summary JSON
             Map<String, Object> summary =
                     objectMapper.readValue(r.getAiSummary(), Map.class);
 
             summary.put("generatedAt", r.getGeneratedAt());
-
             summary.put("resultId", r.getId());
 
             summaries.add(summary);
-            summaries.add(
-                    objectMapper.readValue(r.getAiSummary(), Map.class)
-            );
         }
 
         return summaries;
