@@ -56,7 +56,8 @@ public class PsychometricController {
     }
 
     @PostMapping("/start")
-    public StartTestResponse startTest(@RequestBody StartTestRequest req) {
+    public StartTestResponse startTest(@RequestBody StartTestRequest req)
+    {
         return psychometricService.startTest(req);
     }
 

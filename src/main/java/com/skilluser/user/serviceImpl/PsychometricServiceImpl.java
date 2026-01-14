@@ -279,7 +279,6 @@ public class PsychometricServiceImpl implements PsychometricService {
 
 
     @Override
-
     public UserWiseResponseDto getResponsesByUserId(Long userId) {
 
         List<PsychometricAttempt> attempts =
