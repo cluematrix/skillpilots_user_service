@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.fiegnclient.StudentEmploymentClient;
+import com.skilluser.user.model.ContactRequest;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.ModuleService;
+import com.skilluser.user.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,16 +53,20 @@ public class LoginController {
     private ModuleService moduleService;
     @Autowired
     private StudentEmploymentClient studentEmploymentClient;
+    @Autowired
+    private UserService userService;
 
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse httpResponse) {
         Map<String, Object> response = new HashMap<>();
 
-        try {
+        try
+        {
             // Load user by email
             User user = userRepository.findByEmail(loginRequest.getEmail());
-            if (user == null) {
+            if (user == null)
+            {
                 throw new BadCredentialsException("User not found");
             }
 
@@ -70,11 +76,13 @@ public class LoginController {
             boolean isAuthenticated = false;
 
             // Case 1: If stored password is BCrypt hashed
-            if (storedPassword != null && storedPassword.startsWith("$2a$")) {
+            if (storedPassword != null && storedPassword.startsWith("$2a$"))
+            {
                 isAuthenticated = passwordEncoder.matches(rawPassword, storedPassword);
             }
             // Case 2: If stored password is plain text
-            else if (storedPassword != null && storedPassword.equals(rawPassword)) {
+            else if (storedPassword != null && storedPassword.equals(rawPassword))
+            {
                 isAuthenticated = true;
 
                 // Upgrade plain-text password to hashed password
@@ -83,7 +91,8 @@ public class LoginController {
                 userRepository.save(user);
             }
 
-            if (!isAuthenticated) {
+            if (!isAuthenticated)
+            {
                 throw new BadCredentialsException("Invalid credentials");
             }
 
@@ -187,8 +196,11 @@ public class LoginController {
                 "name",username
         ));
     }
-
-
+    @PostMapping("/contact")
+    public ResponseEntity<?> sendMessage( @RequestBody ContactRequest request) {
+        userService.processContact(request);
+        return ResponseEntity.ok("Message sent successfully");
+    }
    /* @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request)
     {
