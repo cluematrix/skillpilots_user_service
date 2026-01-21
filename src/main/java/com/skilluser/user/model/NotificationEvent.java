@@ -18,4 +18,5 @@ public class NotificationEvent {
     private Long deptId;
     private Long studentId;
     private Long companyId;
+    private String path;
 }
