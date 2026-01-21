@@ -6,6 +6,7 @@ import com.skilluser.user.dto.AnswerDto;
 import com.skilluser.user.dto.StartTestRequest;
 import com.skilluser.user.dto.StartTestResponse;
 import com.skilluser.user.dto.ai.UserWiseResponseDto;
+import com.skilluser.user.model.psychomatrictest.PsychometricResult;
 import com.skilluser.user.model.psychomatrictest.PsychometricTest;
 import org.springframework.data.domain.Pageable;
 
@@ -31,4 +32,6 @@ public interface PsychometricService {
     public boolean canUserGivePsychometricTest(Long userId);
     public Map<String, Object> getLatestSummary(Long userId)
             throws JsonProcessingException;
+
+    public Map<String, Object> getLatestResult(Long userId);
 }
