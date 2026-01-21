@@ -392,5 +392,35 @@ public class PsychometricServiceImpl implements PsychometricService {
         );
     }
 
+    @Override
+    public Map<String, Object> getLatestResult(Long userId) {
+
+        PsychometricResult r =
+                psychometricResultRepository
+                        .findTopByUserIdOrderByGeneratedAtDesc(userId)
+                        .orElse(null);
+
+        if (r == null) {
+            return null;
+        }
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // parse stored JSON string
+            Map<String, Object> summary =
+                    objectMapper.readValue(r.getAiSummary(), Map.class);
+
+            // add metadata
+            summary.put("generatedAt", r.getGeneratedAt());
+            summary.put("resultId", r.getId());
+
+            return summary;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse psychometric summary", e);
+        }
+    }
+
 
 }

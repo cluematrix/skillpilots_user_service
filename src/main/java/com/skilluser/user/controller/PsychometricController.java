@@ -7,6 +7,7 @@ import com.skilluser.user.dto.StartTestRequest;
 import com.skilluser.user.dto.StartTestResponse;
 import com.skilluser.user.dto.ai.PsychometricAnalysisRequest;
 import com.skilluser.user.dto.ai.PsychometricAnswerDto;
+import com.skilluser.user.model.psychomatrictest.PsychometricResult;
 import com.skilluser.user.model.psychomatrictest.PsychometricTest;
 import com.skilluser.user.service.PsychometricService;
 import com.skilluser.user.utility.PaginationUtil;
@@ -85,6 +86,19 @@ public class PsychometricController {
 
         return ResponseEntity.ok(psychometricService.getLatestSummary(userId));
 
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestResult(@RequestParam Long userId) {
+
+        Map<String, Object> result =
+                psychometricService.getLatestResult(userId);
+
+        if (result == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(result);
     }
 
 }
