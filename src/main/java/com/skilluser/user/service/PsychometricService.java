@@ -29,4 +29,6 @@ public interface PsychometricService {
     public UserWiseResponseDto getResponsesByUserId(Long userId);
 
     public boolean canUserGivePsychometricTest(Long userId);
+    public Map<String, Object> getLatestSummary(Long userId)
+            throws JsonProcessingException;
 }

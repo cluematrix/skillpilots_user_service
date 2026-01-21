@@ -1,9 +1,6 @@
 package com.skilluser.user.controller;
 
-import com.skilluser.user.dto.CollegeRequestDTO;
-import com.skilluser.user.dto.CollegeResponseDTO;
-import com.skilluser.user.dto.StateResponseDTO;
-import com.skilluser.user.dto.UniversityResponseDTO;
+import com.skilluser.user.dto.*;
 import com.skilluser.user.model.CollegeMaster;
 import com.skilluser.user.model.StateMaster;
 import com.skilluser.user.model.UniversityMaster;
@@ -240,14 +237,17 @@ public class CollegeMasterController {
     // Get College by university
     @GetMapping("/collegeUniversity/{universityId}")
     public ResponseEntity<?> getCollegesByUniversity(@PathVariable Long universityId) {
-        try {
+        try
+        {
             List<CollegeResponseDTO> colleges =
                     collegeMasterService.getCollegesByUniversity(universityId);
             return ResponseEntity.ok(Map.of(
                     "message", "Colleges fetched successfully!",
                     "data", colleges
             ));
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e)
+        {
             return ResponseEntity.status(404).body(Map.of(
                     "message", e.getMessage()
             ));
@@ -278,4 +278,20 @@ public class CollegeMasterController {
         Map<String, Object> response = collegeMasterService.uploadMasterData(file);
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/collegeMaster/{universityId}")
+    public ResponseEntity<?> getCollegeListByUniversity(@PathVariable Long universityId)
+    {
+        List<CollegeList> colleges =
+                collegeMasterService.getCollegeListByUniversity(universityId);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Colleges fetched successfully",
+                        "data", colleges
+                )
+        );
+    }
+
 }

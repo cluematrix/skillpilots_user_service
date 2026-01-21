@@ -56,7 +56,8 @@ public class PsychometricController {
     }
 
     @PostMapping("/start")
-    public StartTestResponse startTest(@RequestBody StartTestRequest req) {
+    public StartTestResponse startTest(@RequestBody StartTestRequest req)
+    {
         return psychometricService.startTest(req);
     }
 
@@ -76,6 +77,14 @@ public class PsychometricController {
     @GetMapping("/responses/{userId}")
     public ResponseEntity<?> getResponsesByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(psychometricService.getResponsesByUserId(userId));
+    }
+
+    @GetMapping("/latest/{userId}")
+    public ResponseEntity<Map<String, Object>> getLatest(@PathVariable Long userId)
+            throws JsonProcessingException {
+
+        return ResponseEntity.ok(psychometricService.getLatestSummary(userId));
+
     }
 
 }

@@ -31,6 +31,7 @@ public class UserController {
     private final UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
+
     public UserController(UserService userService, ModelMapper modelMapper, OtpService otpService, UserRepository userRepository) {
         this.userService = userService;
         this.modelMapper = modelMapper;
@@ -39,8 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getByUserId(@PathVariable Long id)
-    {
+    public UserDto getByUserId(@PathVariable Long id) {
         User user = userService.getUserById(id);
         UserDto dto = new UserDto();
         dto.setId(user.getId());
@@ -48,8 +48,7 @@ public class UserController {
         dto.setEmail(user.getEmail());
         dto.setContactNo(user.getContact_no());
 
-        if (user.getRoles() != null)
-        {
+        if (user.getRoles() != null) {
             dto.setRole(user.getRoles().getName());
         }
 
@@ -81,10 +80,8 @@ public class UserController {
 
     // Ajay - 07-10-2025 - All data fetch by user id
     @GetMapping("/allUsers/{userId}")
-    public ResponseEntity<?> getAllByUserId(@PathVariable Long userId)
-    {
-        try
-        {
+    public ResponseEntity<?> getAllByUserId(@PathVariable Long userId) {
+        try {
             User allUsers = userService.getAllDataByUserId(userId);
 
             Map<String, Object> response = new HashMap<>();
@@ -92,16 +89,13 @@ public class UserController {
             response.put("data", allUsers);
 
             return ResponseEntity.ok(response);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "Error retrieving user data");
             errorResponse.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
 
 
     @GetMapping("/getUsername")
@@ -114,16 +108,12 @@ public class UserController {
     public ResponseEntity<String> sendVerificationEmail(
             @RequestParam("toEmail") String toEmail,
             @RequestParam("subject") String subject,
-            @RequestParam("content") String content)
-    {
-        try
-        {
+            @RequestParam("content") String content) {
+        try {
             // Call the service to send the email
             otpService.sendVerificationEmail(toEmail, subject, content);
             return ResponseEntity.ok("Verification email sent successfully to " + toEmail);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // Handle error and return appropriate response
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send verification email: " + e.getMessage());
@@ -146,13 +136,12 @@ public class UserController {
     }
 
 
-
     @GetMapping("/byRoleAndDepartment")
     public ResponseEntity<List<UserDto>> findUsersByRoleAndDepartment(
             @RequestParam("roleId") Long roleId,
             @RequestParam(value = "departmentId", required = false) Long departmentId
     ) {
-        List<User> users = userService.findUsersByRoleAndDepartment(roleId,departmentId);
+        List<User> users = userService.findUsersByRoleAndDepartment(roleId, departmentId);
 
         List<UserDto> dtos = users.stream().map(user -> {
             UserDto userDto = new UserDto();
@@ -160,7 +149,7 @@ public class UserController {
             userDto.setName(user.getName());
             userDto.setEmail(user.getEmail());
             userDto.setCollegeId(user.getCollegeId());
-            if(user.getRoles()!=null) {
+            if (user.getRoles() != null) {
                 userDto.setRole(user.getRoles().getName());
             }
             return userDto;
@@ -174,7 +163,7 @@ public class UserController {
             @RequestParam("roleId") Long roleId,
             @RequestParam("collegeId") Long collegeId
     ) {
-        List<User> users = userService.findUsersByRoles_IdAndCollegeId(roleId,collegeId);
+        List<User> users = userService.findUsersByRoles_IdAndCollegeId(roleId, collegeId);
 
         List<UserDto> dtos = users.stream().map(user -> {
             UserDto userDto = new UserDto();
@@ -182,7 +171,7 @@ public class UserController {
             userDto.setName(user.getName());
             userDto.setEmail(user.getEmail());
             userDto.setCollegeId(user.getCollegeId());
-            if(user.getRoles()!=null){
+            if (user.getRoles() != null) {
                 userDto.setRole(user.getRoles().getName());
             }
             return userDto;
@@ -215,17 +204,15 @@ public class UserController {
     }
 
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        try {
+            User user = userService.forgotPassword(email);
+            return ResponseEntity.ok(Map.of("message", "Temporary password sent to your email", "email", user.getEmail()));
 
-        @PostMapping("/forgot-password")
-        public ResponseEntity<?> forgotPassword (@RequestParam String email)
-        {
-            try {
-                User user = userService.forgotPassword(email);
-                return ResponseEntity.ok(Map.of("message", "Temporary password sent to your email", "email", user.getEmail()));
-
-            } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-            }
-
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
+
+    }
 }
