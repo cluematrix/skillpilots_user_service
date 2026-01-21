@@ -8,6 +8,7 @@ import java.util.List;
 public interface DomainService {
 
 
+
     public Domain createDomain(Domain domain);
     public List<Domain> getDomains();
 
@@ -16,6 +17,9 @@ public interface DomainService {
 
 
     List<DomainDto> getDomainsDto();
+
+
+
 
 
 }
