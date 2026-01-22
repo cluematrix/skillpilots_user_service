@@ -88,17 +88,17 @@ public class PsychometricController {
 
     }
 
-    @GetMapping("/latest")
-    public ResponseEntity<?> getLatestResult(@RequestParam Long userId) {
+    @GetMapping("/latestResult")
+    public ResponseEntity<?> getLatestResult(@RequestParam Long userId)
+    {
+        Map<String, Object> result
+                = psychometricService.getLatestResult(userId);
 
-        Map<String, Object> result =
-                psychometricService.getLatestResult(userId);
-
-        if (result == null) {
+        if (result == null)
+        {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok(result);
     }
-
 }
+
