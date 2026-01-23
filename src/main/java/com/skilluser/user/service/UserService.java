@@ -1,5 +1,6 @@
 package com.skilluser.user.service;
 
+import com.skilluser.user.model.BusinessUser;
 import com.skilluser.user.model.ContactRequest;
 import com.skilluser.user.model.User;
 
@@ -32,4 +33,6 @@ public interface UserService {
     );
 
     public void processContact(ContactRequest req);
+
+    public BusinessUser createUser( BusinessUser user);
 }

@@ -1,11 +1,15 @@
 package com.skilluser.user.controller;
 
+import com.skilluser.user.dto.ApplyCoupon;
 import com.skilluser.user.dto.ChangePasswordRequest;
+import com.skilluser.user.dto.CreateCouponRequest;
 import com.skilluser.user.dto.UserDto;
+import com.skilluser.user.model.BusinessUser;
 import com.skilluser.user.model.Role;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.RoleRepository;
 import com.skilluser.user.repository.UserRepository;
+import com.skilluser.user.service.CouponService;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -31,6 +35,8 @@ public class UserController {
     private final UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private CouponService couponService;
 
     public UserController(UserService userService, ModelMapper modelMapper, OtpService otpService, UserRepository userRepository) {
         this.userService = userService;
@@ -214,5 +220,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
 
+    }
+
+    @PostMapping("/business")
+    public ResponseEntity<?> createUser(@RequestBody BusinessUser user){
+        return ResponseEntity.ok(userService.createUser(user));
+    }
+
+    @PostMapping("/coupon")
+    public ResponseEntity<?> createCoupon(@RequestBody CreateCouponRequest createCouponRequest){
+        return ResponseEntity.ok(couponService.createCoupon(createCouponRequest));
+    }
+
+    @PostMapping("/coupon_preview")
+    public ResponseEntity<?> couponPreview(@RequestBody ApplyCoupon applyCoupon){
+        double amount = couponService.applyCoupon(applyCoupon.getCouponCode(),
+                applyCoupon.getUserId(), applyCoupon.getAmount());
+        return ResponseEntity.ok(Map.of("amount",amount));
+    }
+
+    @PostMapping("/apply_coupon")
+    public String applyCoupon(@RequestBody ApplyCoupon  applyCoupon){
+        couponService.confirmPaymentAndConsumeCoupon(applyCoupon.getCouponCode(),applyCoupon.getUserId());
+        return "Coupon Applied Successfully";
     }
 }
