@@ -57,6 +57,7 @@ public class LoginController {
     private UserService userService;
 
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse httpResponse) {
         Map<String, Object> response = new HashMap<>();
@@ -185,7 +186,8 @@ public class LoginController {
         Claims claims = jwtUtils.decodeToken(token);
         Long userId = claims.get("userId",Long.class);
         claims.get("deptId", Long.class);
-
+        Map<String, Object> studentData =
+                studentEmploymentClient.getWorkStatus(userId);
         String username = userRepository.findById(userId).map(User::getName).get();
         // fetch permission
         Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
@@ -193,7 +195,8 @@ public class LoginController {
                 "valid", true,
                 "user", claims,
                 "permission",permissionsForUser,
-                "name",username
+                "name",username,
+                "work_status",studentData
         ));
     }
     @PostMapping("/contact")

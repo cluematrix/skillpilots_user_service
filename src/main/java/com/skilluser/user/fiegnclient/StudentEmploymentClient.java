@@ -12,4 +12,7 @@ public interface StudentEmploymentClient
     @GetMapping("/experience/{studentId}")
     Integer getTotalExperience(@PathVariable("studentId") Long studentId);
 
+    @GetMapping("/work-status/{studentId}")
+    public Map<String, Object> getWorkStatus(@PathVariable Long studentId);
+
 }
