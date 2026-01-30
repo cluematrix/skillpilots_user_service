@@ -4,5 +4,6 @@ public enum QuestionType {
     TRUE_FALSE,
     YES_NO,
     MCQ,
-    DESCRIPTIVE
+    DESCRIPTIVE,
+    MULTI_SELECT
 }
