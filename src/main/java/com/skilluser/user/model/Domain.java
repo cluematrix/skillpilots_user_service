@@ -19,8 +19,11 @@ public class Domain {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(nullable = true)
+    private Long companyId;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
