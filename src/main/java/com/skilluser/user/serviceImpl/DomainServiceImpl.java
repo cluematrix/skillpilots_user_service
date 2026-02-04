@@ -17,15 +17,23 @@ public class DomainServiceImpl implements DomainService {
     private final DomainRepository domainRepository;
 
     @Override
-    public Domain createDomain(Domain domain) {
+    public Domain createDomain(Domain domain)
+    {
         return domainRepository.save(domain);
     }
 
-    @Override
+   /* @Override
     public List<Domain> getDomains() {
         List<Domain> all = domainRepository.findAll();
         Collections.reverse(all);
         return all;
+    }
+*/
+
+    @Override
+    public List<Domain> getDomains()
+    {
+        return domainRepository.findByCompanyIdIsNullOrderByIdDesc();
     }
 
 
@@ -49,6 +57,11 @@ public class DomainServiceImpl implements DomainService {
                 .toList();
     }
 
+    @Override
+    public List<Domain> getDomainByCompany(Long companyId)
+    {
+        return domainRepository.findByCompanyId(companyId);
+    }
 
 
 }

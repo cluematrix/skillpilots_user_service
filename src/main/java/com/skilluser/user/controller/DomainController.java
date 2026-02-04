@@ -31,6 +31,12 @@ public class DomainController
     }
 
 
+    @GetMapping("/{companyId}")
+    public  ResponseEntity<?> getDomainsByCompany(@PathVariable Long companyId)
+    {
+        return ResponseEntity.status(HttpStatus.OK).body(domainService.getDomainByCompany(companyId));
+    }
+
     @GetMapping("/dto")   // Ashvin 5-01-26 get domain in Dto responce
     public ResponseEntity<List<DomainDto>> getDomainsDto() {
         return ResponseEntity.ok(domainService.getDomainsDto());
