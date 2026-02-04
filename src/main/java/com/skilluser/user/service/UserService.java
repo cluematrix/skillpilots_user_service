@@ -35,4 +35,6 @@ public interface UserService {
     public void processContact(ContactRequest req);
 
     public BusinessUser createUser( BusinessUser user);
+
+    public boolean hasStudentGivenTest(Long studentId);
 }

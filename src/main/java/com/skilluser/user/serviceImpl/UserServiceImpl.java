@@ -40,6 +40,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private ContactRepository contactRepository;
     @Autowired
     private BusinessUserRepository businessUserRepository;
+    @Autowired
+    private AssessmentCheckRepository assessmentCheckRepository;
 
 
     @Autowired
@@ -252,6 +254,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public BusinessUser createUser(BusinessUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return businessUserRepository.save(user);
+    }
+
+    @Override
+    public boolean hasStudentGivenTest(Long studentId) {
+        return assessmentCheckRepository.hasGivenAnyAssessment(studentId);
+
     }
 
     private void sendMailToSupport(ContactRequest req) {

@@ -191,12 +191,15 @@ public class LoginController {
         String username = userRepository.findById(userId).map(User::getName).get();
         // fetch permission
         Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
+        boolean given = userService.hasStudentGivenTest(userId);
+
         return ResponseEntity.ok(Map.of(
                 "valid", true,
                 "user", claims,
                 "permission",permissionsForUser,
                 "name",username,
-                "work_status",studentData
+                "work_status",studentData,
+                "hasGivenSkillAssessment", given
         ));
     }
     @PostMapping("/contact")
