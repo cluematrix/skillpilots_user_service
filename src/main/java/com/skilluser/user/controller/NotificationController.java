@@ -26,7 +26,7 @@ public class NotificationController {
 
 
 
-    // get all unread notifications
+    // get all unread notifications - 23/01/2026
     @GetMapping("/unread/{userId}")
     public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long userId) {
         List<Notification> notifications = notificationRepository.findByReceiverIdAndReadStatusFalseOrderByCreatedAtDesc(userId);
@@ -34,15 +34,24 @@ public class NotificationController {
     }
 
 
-    // update read status when user seen notification
-    @PutMapping("/read/{id}")
-    public ResponseEntity<Map<String,String>> markAsRead(@PathVariable Long id) {
+    // mark as read / update read status when user seen notification and delete it from database - 23/01/2026
+    @PutMapping("/read/{notificationId}/{userId}")
+    public ResponseEntity<Map<String,String>> markAsRead(@PathVariable Long notificationId,
+                                                         @PathVariable Long userId)
+    {
         Map<String,String> response = new HashMap<>();
-        Notification notification = notificationRepository.findById(id)
+
+        Notification notification = notificationRepository
+                .findByNotificationIdAndReceiverId(notificationId, userId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+        // mark read (logical)
         notification.setReadStatus(true);
-        notificationRepository.save(notification);
-        response.put("message", "user seen notification successfully!");
+
+        // delete immediately
+        notificationRepository.delete(notification);
+
+        response.put("message", "Notification read and removed successfully");
         return ResponseEntity.ok(response);
     }
 }
