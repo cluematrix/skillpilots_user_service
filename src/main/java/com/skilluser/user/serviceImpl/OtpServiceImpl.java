@@ -6,6 +6,7 @@ import com.skilluser.user.model.User;
 import com.skilluser.user.repository.OtpRepository;
 import com.skilluser.user.service.OtpService;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import lombok.AllArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -80,24 +81,46 @@ public class OtpServiceImpl implements OtpService {
         return latestOtp.isPresent() && latestOtp.get().isValid(inputOtp);
     }*/
 
+//    @Async
+//    @Override
+//    public void sendVerificationEmail(String toEmail, String subject, String content)
+//    {
+//        try
+//        {
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+//            helper.setTo(toEmail);
+//            helper.setSubject(subject);
+//
+//            String emailContent = content;
+//
+//            helper.setText(emailContent, true);
+//            javaMailSender.send(message);
+//        }
+//        catch (MessagingException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
+
     @Async
     @Override
-    public void sendVerificationEmail(String toEmail, String subject, String content)
-    {
-        try
-        {
+    public void sendVerificationEmail(String toEmail, String subject, String content) {
+        try {
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(new InternetAddress(
+                    "support@skillpilots.com",
+                    "SkillPilots"
+            ));
+
             helper.setTo(toEmail);
             helper.setSubject(subject);
+            helper.setText(content, true);
 
-            String emailContent = content;
-
-            helper.setText(emailContent, true);
             javaMailSender.send(message);
-        }
-        catch (MessagingException e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
