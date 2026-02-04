@@ -1,6 +1,7 @@
 package com.skilluser.user.controller;
 
 import com.skilluser.user.dto.ChangePasswordRequest;
+import com.skilluser.user.dto.EmailMessageDto;
 import com.skilluser.user.dto.UserDto;
 import com.skilluser.user.model.Role;
 import com.skilluser.user.model.User;
@@ -118,6 +119,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send verification email: " + e.getMessage());
         }
+    }
+
+
+    @PostMapping("/new/email")
+    public ResponseEntity<String> sendVerificationEmail1(
+            @RequestBody EmailMessageDto dto) {
+
+        otpService.sendVerificationEmail(
+                dto.getEmail(),
+                dto.getSubject(),
+                dto.getContent()
+        );
+
+        return ResponseEntity.ok("Email sent to " + dto.getEmail());
     }
 
 
