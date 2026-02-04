@@ -19,6 +19,9 @@ public interface DomainService {
 
     List<DomainDto> getDomainsDto();
 
+    List<Domain> getDomainByCompany(Long companyId);
+
+
 
 
 

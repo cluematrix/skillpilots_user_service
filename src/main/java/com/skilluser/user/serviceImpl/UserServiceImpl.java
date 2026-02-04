@@ -38,6 +38,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private JavaMailSender javaMailSender;
     @Autowired
     private ContactRepository contactRepository;
+    @Autowired
+    private BusinessUserRepository businessUserRepository;
+    @Autowired
+    private AssessmentCheckRepository assessmentCheckRepository;
 
 
     @Autowired
@@ -165,7 +169,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 hasPaid = true;
 
             } else {
-                // ❌ College not paid → check student payment
+                // College not paid → check student payment
                 PaymentHistory payment =
                         paymentHistoryRepo.findTopByUserIdAndStatusOrderByPaymentDateDesc(
                                 userId, "CHARGED"
@@ -243,6 +247,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         contactRepository.save(req);
         sendMailToSupport(req);
         sendConfirmationToUser(req);
+
+    }
+
+    @Override
+    public BusinessUser createUser(BusinessUser user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return businessUserRepository.save(user);
+    }
+
+    @Override
+    public boolean hasStudentGivenTest(Long studentId) {
+        return assessmentCheckRepository.hasGivenAnyAssessment(studentId);
 
     }
 
