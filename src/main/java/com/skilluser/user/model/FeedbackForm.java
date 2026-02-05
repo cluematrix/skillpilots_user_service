@@ -18,14 +18,40 @@ public class FeedbackForm {
     private String collegeName;
     private String course;
     private String currentYearOfStudy;
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String overallSession;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String studentFriendly;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String exampleExplanation;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String sessionLikeInFuture;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String improveFutureSession;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String careerGrowthAndDirection;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String touchInFutureForProgram;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String freeTrialOfPsychoTest;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String anyDoubts;
     private LocalDate createdDate;
     private LocalDate updatedDate;
