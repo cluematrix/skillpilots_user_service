@@ -9,8 +9,10 @@ import java.util.stream.Collectors;
 import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.fiegnclient.StudentEmploymentClient;
 import com.skilluser.user.model.ContactRequest;
+import com.skilluser.user.model.FeedbackForm;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
+import com.skilluser.user.service.FeedbackFormService;
 import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -55,7 +57,8 @@ public class LoginController {
     private StudentEmploymentClient studentEmploymentClient;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private FeedbackFormService feedbackFormService;
 
 
     @PostMapping("/login")
@@ -259,5 +262,73 @@ public class LoginController {
                 "name",username
         ));
     }*/
+   // create feedback form
+   @PostMapping("feedback")
+   public ResponseEntity<Map<String,Object>> createFeedbackForm(@RequestBody FeedbackForm feedbackForm){
+       Map<String, Object> response = new HashMap<>();
+       try {
+           FeedbackForm form = feedbackFormService.createFeedbackForm(feedbackForm);
+           response.put("status", "success");
+           response.put("data", form);
+           return ResponseEntity.ok(response);
 
+       } catch (RuntimeException e){
+           response.put("status", "error");
+           response.put("message", e.getMessage());
+           response.put("errorType", e.getClass().getSimpleName());
+
+           return ResponseEntity
+                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body(response);
+       }
+   }
+
+
+    // get feedback form by Id
+    @GetMapping("feedback/{id}")
+    public ResponseEntity<FeedbackForm> getFeedbackFormById(@PathVariable  Long id){
+        FeedbackForm form = feedbackFormService.getFeedbackFormById(id);
+        return ResponseEntity.ok(form);
+    }
+
+
+    // get all Feedback forms
+    @GetMapping("feedback")
+    public ResponseEntity<List<FeedbackForm>> getAllFeedbackForms(){
+        List<FeedbackForm> forms = feedbackFormService.getAllFeedbackForms();
+        return ResponseEntity.ok(forms);
+    }
+
+
+    // delete feedback form by id
+    @DeleteMapping("/feedback/{id}")
+    public ResponseEntity<Map<String, String>> deleteFeedbackFormById(@PathVariable Long id){
+        Map<String,String> response = new HashMap<>();
+        try{
+            feedbackFormService.deleteById(id);
+            response.put("message","Feedback form is deleted successfully.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message",e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
+
+
+
+    // update Feedback form
+    @PutMapping("feedback/{id}")
+    public ResponseEntity<Map<String,String>> updateFeedbackForm(@RequestBody FeedbackForm feedbackForm,
+                                                                 @PathVariable Long id)
+    {
+        Map<String,String> response = new HashMap<>();
+        try{
+            feedbackFormService.updateFeedbackForm(feedbackForm,id);
+            response.put("message","Feedback form is updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message",e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
 }

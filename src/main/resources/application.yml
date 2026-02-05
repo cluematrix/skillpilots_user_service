@@ -6,3 +6,16 @@ management:
   endpoint:
     health:
       show-details: always
+
+      resilience4j:
+        circuitbreaker:
+          instances:
+            STUDENT-SERVICE:
+              failureRateThreshold: 50
+              slidingWindowSize: 10
+              waitDurationInOpenState: 10s
+
+        timelimiter:
+          instances:
+            STUDENT-SERVICE:
+              timeoutDuration: 2s

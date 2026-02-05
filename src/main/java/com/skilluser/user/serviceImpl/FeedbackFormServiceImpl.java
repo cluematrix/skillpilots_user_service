@@ -3,6 +3,7 @@ package com.skilluser.user.serviceImpl;
 import com.skilluser.user.model.FeedbackForm;
 import com.skilluser.user.repository.FeedbackFormRepository;
 import com.skilluser.user.service.FeedbackFormService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class FeedbackFormServiceImpl implements FeedbackFormService {
 
     // create feedback form
     @Override
+    @Transactional
     public FeedbackForm createFeedbackForm(FeedbackForm feedbackForm) {
         feedbackForm.setCreatedDate(LocalDate.now());
         return feedbackFormRepository.save(feedbackForm);
