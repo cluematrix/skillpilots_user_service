@@ -1,15 +1,20 @@
 package com.skilluser.user.serviceImpl;
 
+import com.skilluser.user.fiegnclient.StudentEmploymentClient;
 import com.skilluser.user.model.*;
 import com.skilluser.user.repository.*;
 
 
 import com.skilluser.user.model.User;
 
+import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.OtpService;
 import com.skilluser.user.service.UserService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,10 +47,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private BusinessUserRepository businessUserRepository;
     @Autowired
     private AssessmentCheckRepository assessmentCheckRepository;
-
-
+    @Autowired
+    @Lazy
+    private ModuleService moduleService;
+    @Autowired
+    private StudentEmploymentClient studentEmploymentClient;
     @Autowired
     private OtpService otpService;
+    @Autowired
+    private  StudentWorkStatusService workStatusService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -262,6 +272,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
+
     private void sendMailToSupport(ContactRequest req) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(SUPPORT_EMAIL);
@@ -299,5 +310,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return String.valueOf(otp);
     }
 
+    public Map<String, Object> buildProfile(Long userId, Claims claims) {
+
+        Map<String, Object> workStatus =workStatusService. getWorkStatus(userId);
+        String username = userRepository.findById(userId)
+                .map(User::getName)
+                .orElse("NA");
+
+        Map<String, Object> permissions = moduleService.getPermissionsForUser(userId);
+        boolean given = assessmentCheckRepository.hasGivenAnyAssessment(userId);
+
+        return Map.of(
+                "valid", true,
+                "user", claims,
+                "permission", permissions,
+                "name", username,
+                "work_status", workStatus,
+                "hasGivenSkillAssessment", given
+        );
+    }
 
 }

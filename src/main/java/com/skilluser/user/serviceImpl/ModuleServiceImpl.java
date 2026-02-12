@@ -229,67 +229,156 @@ public class ModuleServiceImpl implements ModuleService {
         }
     }
 
-    @Override
 
+
+    @Override
     public Map<String, Object> getPermissionsForUser(Long userId) {
+
         Map<String, Object> response = new HashMap<>();
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User Not found"));
+
+        if (user.getRoles() == null) {
+            return response;
+        }
+        long id = user.getCollegeId();  // int → Long
+        Long roleId = user.getRoles().getId();
+                  Long collegeId = user.getCollegeId() != 0 ? id : null;
+
+
+        Long companyId = user.getCompanyId();
+
+    /*
+     ==========================================================
+     STEP 1: Load Default Permissions (Base Layer)
+     ==========================================================
+    */
+        List<ModulePermission> defaultPermissions =
+                modulePermissionRepository
+                        .findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+
+    /*
+     ==========================================================
+     STEP 2: Load College + Company Specific
+     ==========================================================
+    */
+        List<ModulePermission> collegePermissions = new ArrayList<>();
+        List<ModulePermission> companyPermissions = new ArrayList<>();
+
+        if (collegeId != null) {
+            collegePermissions =
+                    modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
+        }
+
+        if (companyId != null) {
+            companyPermissions =
+                    modulePermissionRepository.findByRoleIdAndCompanyId(roleId, companyId);
+        }
+
+    /*
+     ==========================================================
+     STEP 3: Merge with Override Logic
+     Priority:
+     Default < College < Company
+     ==========================================================
+    */
+        Map<String, ModulePermission> permissionMap = new LinkedHashMap<>();
+
+        // Default first
+        for (ModulePermission p : defaultPermissions) {
+            permissionMap.put(p.getModule().getName(), p);
+        }
+
+        // College overrides default
+        for (ModulePermission p : collegePermissions) {
+            permissionMap.put(p.getModule().getName(), p);
+        }
+
+        // Company overrides both
+        for (ModulePermission p : companyPermissions) {
+            permissionMap.put(p.getModule().getName(), p);
+        }
+
+    /*
+     ==========================================================
+     STEP 4: Convert to Response Format
+     ==========================================================
+    */
         List<Map<String, Object>> permsList = new ArrayList<>();
 
-        if (user.getRoles() != null) { // Predefined role
-            Long roleId = user.getRoles().getId();
-            long id = user.getCollegeId();  // int → Long
+        for (ModulePermission p : permissionMap.values()) {
 
-            Long collegeId = user.getCollegeId() != 0 ? id : null;
-            Long companyId = user.getCompanyId() != null ? user.getCompanyId() : null;
+            Map<String, Object> map = new HashMap<>();
 
-            List<ModulePermission> permissions;
-            System.out.println("Rolessssssssss"+user.getRoles().getName());
-            if (user.getRoles().getName().equals("INT_STUDENT") || user.getRoles().getName().equals("EXT_STUDENT")) {
-                permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
-                System.out.println("dddddddddddddddd"+ permissions);
-            } else if (collegeId != null) {
-                permissions = modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
-                if (permissions.isEmpty()) {
-                    permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
-                }
-            } else if (companyId != null) {
-                permissions = modulePermissionRepository.findByRoleIdAndCompanyId(roleId, companyId);
-                if (permissions.isEmpty()) {
-                    permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
-                }
-            } else {
-                // fallback → admin default
-                permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
-            }
+            map.put("module", p.getModule().getName());
+            map.put("moduleId",p.getModule().getId());
+            map.put("path", p.getPath());
+            map.put("canView", p.isCanView());
+            map.put("canAdd", p.isCanAdd());
+            map.put("canEdit", p.isCanEdit());
+            map.put("canDelete", p.isCanDelete());
+            map.put("isSidebar", p.getModule().isSidebar());
+
+            permsList.add(map);
+        }
+
+    /*
+     ==========================================================
+     STEP 5: Final Response
+     ==========================================================
+    */
+        response.put("roleType", "PREDEFINED");
+        response.put("roleName", user.getRoles().getName());
+        response.put("permissions", permsList);
+
+        // Extra data
+        response.put("payment", userService.checkPayment(userId));
+        response.put("plan", userService.getPlanAmount(userId));
+        response.put("test_given",
+                psychometricResultRepository.existsByUserId(userId));
+
+        return response;
+    }
 
 
-            for (ModulePermission p : permissions) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("module", p.getModule().getName());
-                map.put("path", p.getPath());
-                map.put("canView", p.isCanView());
-                map.put("canAdd", p.isCanAdd());
-                map.put("canEdit", p.isCanEdit());
-                map.put("canDelete", p.isCanDelete());
-                map.put("isSidebar", p.getModule().isSidebar());
-                permsList.add(map);
-            }
-
-            response.put("roleType", "PREDEFINED");
-            response.put("roleName", user.getRoles().getName());
-            response.put("permissions", permsList);
-            Map<String, Object> map = userService.checkPayment(userId);
-            response.put("payment",map);
-            response.put("plan",userService.getPlanAmount(userId));
-            response.put("test_given",psychometricResultRepository.existsByUserId(userId));
-
-//        } else if (user.getCustomRole() != null) { // Custom role
-//            List<CustomRolePermission> permissions =
-//                    customRolePermissionRepository.findByCustomRoleId(user.getCustomRole().getId());
+//    @Override
 //
-//            for (CustomRolePermission p : permissions) {
+//    public Map<String, Object> getPermissionsForUser(Long userId) {
+//        Map<String, Object> response = new HashMap<>();
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("User Not found"));
+//        List<Map<String, Object>> permsList = new ArrayList<>();
+//
+//        if (user.getRoles() != null) { // Predefined role
+//            Long roleId = user.getRoles().getId();
+//            long id = user.getCollegeId();  // int → Long
+//
+//            Long collegeId = user.getCollegeId() != 0 ? id : null;
+//            Long companyId = user.getCompanyId() != null ? user.getCompanyId() : null;
+//
+//            List<ModulePermission> permissions;
+//            System.out.println("Rolessssssssss"+user.getRoles().getName());
+//            if (user.getRoles().getName().equals("INT_STUDENT") || user.getRoles().getName().equals("EXT_STUDENT")) {
+//                permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+//                System.out.println("dddddddddddddddd"+ permissions);
+//            } else if (collegeId != null) {
+//                permissions = modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
+//                if (permissions.isEmpty()) {
+//                    permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+//                }
+//            } else if (companyId != null) {
+//                permissions = modulePermissionRepository.findByRoleIdAndCompanyId(roleId, companyId);
+//                if (permissions.isEmpty()) {
+//                    permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+//                }
+//            } else {
+//                // fallback → admin default
+//                permissions = modulePermissionRepository.findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+//            }
+//
+//
+//            for (ModulePermission p : permissions) {
 //                Map<String, Object> map = new HashMap<>();
 //                map.put("module", p.getModule().getName());
 //                map.put("path", p.getPath());
@@ -297,16 +386,40 @@ public class ModuleServiceImpl implements ModuleService {
 //                map.put("canAdd", p.isCanAdd());
 //                map.put("canEdit", p.isCanEdit());
 //                map.put("canDelete", p.isCanDelete());
+//                map.put("isSidebar", p.getModule().isSidebar());
 //                permsList.add(map);
 //            }
 //
-//            response.put("roleType", "CUSTOM");
-//            response.put("roleName", user.getCustomRole().getName());
+//            response.put("roleType", "PREDEFINED");
+//            response.put("roleName", user.getRoles().getName());
 //            response.put("permissions", permsList);
+//            Map<String, Object> map = userService.checkPayment(userId);
+//            response.put("payment",map);
+//            response.put("plan",userService.getPlanAmount(userId));
+//            response.put("test_given",psychometricResultRepository.existsByUserId(userId));
+//
+////        } else if (user.getCustomRole() != null) { // Custom role
+////            List<CustomRolePermission> permissions =
+////                    customRolePermissionRepository.findByCustomRoleId(user.getCustomRole().getId());
+////
+////            for (CustomRolePermission p : permissions) {
+////                Map<String, Object> map = new HashMap<>();
+////                map.put("module", p.getModule().getName());
+////                map.put("path", p.getPath());
+////                map.put("canView", p.isCanView());
+////                map.put("canAdd", p.isCanAdd());
+////                map.put("canEdit", p.isCanEdit());
+////                map.put("canDelete", p.isCanDelete());
+////                permsList.add(map);
+////            }
+////
+////            response.put("roleType", "CUSTOM");
+////            response.put("roleName", user.getCustomRole().getName());
+////            response.put("permissions", permsList);
+////        }
 //        }
-        }
-        return response;
-    }
+//        return response;
+//    }
 
 }
 

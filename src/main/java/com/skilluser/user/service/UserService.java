@@ -3,6 +3,7 @@ package com.skilluser.user.service;
 import com.skilluser.user.model.BusinessUser;
 import com.skilluser.user.model.ContactRequest;
 import com.skilluser.user.model.User;
+import io.jsonwebtoken.Claims;
 
 import java.util.List;
 import java.util.Map;
@@ -37,4 +38,6 @@ public interface UserService {
     public BusinessUser createUser( BusinessUser user);
 
     public boolean hasStudentGivenTest(Long studentId);
+
+    public Map<String, Object> buildProfile(Long userId, Claims claims);
 }

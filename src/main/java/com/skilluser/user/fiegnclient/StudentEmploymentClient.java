@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
-@FeignClient(name="STUDENT-SERVICE", path = "/api/v1/students/employment",
-        fallback = StudentEmploymentFallback.class
+@FeignClient(name="STUDENT-SERVICE", path = "/api/v1/students/employment"
+
 )
 public interface StudentEmploymentClient
 {
