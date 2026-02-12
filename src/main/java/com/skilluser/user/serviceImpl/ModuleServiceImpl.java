@@ -203,6 +203,7 @@ public class ModuleServiceImpl implements ModuleService {
                 perm.setCanDelete(req.isCanDelete());
                 perm.setCollegeId(collegeId);
                 perm.setCompanyId(companyId);
+                perm.setPath(module.getPath());
                 modulePermissionRepository.save(perm);
             }
 
