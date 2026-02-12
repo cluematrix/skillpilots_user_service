@@ -124,7 +124,7 @@ public class RoleManagementController {
     @PostMapping("/set")
     public ResponseEntity<?> setPermissions(@RequestBody PermissionSetRequest request) {
         moduleService.setPermissions(request.getRoleId(), request.getCollegeId(), request.getCompanyId(), request.getPermissions());
-        return ResponseEntity.ok("Permissions updated successfully!");
+        return ResponseEntity.ok(Map.of("message","Permissions updated successfully!"));
     }
 
     @GetMapping("/me/{userId}")

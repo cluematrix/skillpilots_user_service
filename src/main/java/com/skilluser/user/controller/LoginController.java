@@ -9,8 +9,11 @@ import java.util.stream.Collectors;
 import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.fiegnclient.StudentEmploymentClient;
 import com.skilluser.user.model.ContactRequest;
+import com.skilluser.user.model.FeedbackForm;
+import com.skilluser.user.model.Role;
 import com.skilluser.user.model.User;
 import com.skilluser.user.repository.UserRepository;
+import com.skilluser.user.service.FeedbackFormService;
 import com.skilluser.user.service.ModuleService;
 import com.skilluser.user.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -55,7 +58,8 @@ public class LoginController {
     private StudentEmploymentClient studentEmploymentClient;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private FeedbackFormService feedbackFormService;
 
 
     @PostMapping("/login")
@@ -126,6 +130,11 @@ public class LoginController {
 
             response.put("token", jwtToken);
             response.put("user_role", roles);
+            Long roleIds = user.getRoles().getId();
+            response.put("roleId", roleIds);
+
+
+
             Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(user.getId());
             response.put("permission",permissionsForUser);
 
@@ -153,10 +162,60 @@ public class LoginController {
     }
 
     // decode token shrunkhal 26/sept
+//    @GetMapping("/me")
+//    public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request) {
+//        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+//
+//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//            return ResponseEntity.status(401).body(Map.of(
+//                    "valid", false,
+//                    "message", "Missing or invalid Authorization header"
+//            ));
+//        }
+//
+//        // Extract token from header
+//        String token = authHeader.substring(7);
+//
+//        if (token.isEmpty()) {
+//            return ResponseEntity.badRequest().body(Map.of(
+//                    "valid", false,
+//                    "message", "Token is empty"
+//            ));
+//        }
+//
+//        // Validate token
+//        if (!jwtUtils.isValidToken(token)) {
+//            return ResponseEntity.status(401).body(Map.of(
+//                    "valid", false,
+//                    "message", "Token is invalid or expired"
+//            ));
+//        }
+//
+//        // Decode token
+//        Claims claims = jwtUtils.decodeToken(token);
+//        Long userId = claims.get("userId",Long.class);
+//        claims.get("deptId", Long.class);
+//        Map<String, Object> studentData =
+//                studentEmploymentClient.getWorkStatus(userId);
+//        String username = userRepository.findById(userId).map(User::getName).get();
+//        // fetch permission
+//        Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
+//        boolean given = userService.hasStudentGivenTest(userId);
+//
+//        return ResponseEntity.ok(Map.of(
+//                "valid", true,
+//                "user", claims,
+//                "permission",permissionsForUser,
+//                "name",username,
+//                "work_status",studentData,
+//                "hasGivenSkillAssessment", given
+//        ));
+//    }
+
     @GetMapping("/me")
     public ResponseEntity<?> validateTokenFromHeader(HttpServletRequest request) {
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(401).body(Map.of(
                     "valid", false,
@@ -164,17 +223,7 @@ public class LoginController {
             ));
         }
 
-        // Extract token from header
         String token = authHeader.substring(7);
-
-        if (token.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "valid", false,
-                    "message", "Token is empty"
-            ));
-        }
-
-        // Validate token
         if (!jwtUtils.isValidToken(token)) {
             return ResponseEntity.status(401).body(Map.of(
                     "valid", false,
@@ -182,26 +231,12 @@ public class LoginController {
             ));
         }
 
-        // Decode token
         Claims claims = jwtUtils.decodeToken(token);
-        Long userId = claims.get("userId",Long.class);
-        claims.get("deptId", Long.class);
-        Map<String, Object> studentData =
-                studentEmploymentClient.getWorkStatus(userId);
-        String username = userRepository.findById(userId).map(User::getName).get();
-        // fetch permission
-        Map<String, Object> permissionsForUser = moduleService.getPermissionsForUser(userId);
-        boolean given = userService.hasStudentGivenTest(userId);
+        Long userId = claims.get("userId", Long.class);
 
-        return ResponseEntity.ok(Map.of(
-                "valid", true,
-                "user", claims,
-                "permission",permissionsForUser,
-                "name",username,
-                "work_status",studentData,
-                "hasGivenSkillAssessment", given
-        ));
+        return ResponseEntity.ok(userService.buildProfile(userId, claims));
     }
+
     @PostMapping("/contact")
     public ResponseEntity<?> sendMessage( @RequestBody ContactRequest request) {
         userService.processContact(request);
@@ -259,5 +294,73 @@ public class LoginController {
                 "name",username
         ));
     }*/
+   // create feedback form
+   @PostMapping("feedback")
+   public ResponseEntity<Map<String,Object>> createFeedbackForm(@RequestBody FeedbackForm feedbackForm){
+       Map<String, Object> response = new HashMap<>();
+       try {
+           FeedbackForm form = feedbackFormService.createFeedbackForm(feedbackForm);
+           response.put("status", "success");
+           response.put("data", form);
+           return ResponseEntity.ok(response);
 
+       } catch (RuntimeException e){
+           response.put("status", "error");
+           response.put("message", e.getMessage());
+           response.put("errorType", e.getClass().getSimpleName());
+
+           return ResponseEntity
+                   .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body(response);
+       }
+   }
+
+
+    // get feedback form by Id
+    @GetMapping("feedback/{id}")
+    public ResponseEntity<FeedbackForm> getFeedbackFormById(@PathVariable  Long id){
+        FeedbackForm form = feedbackFormService.getFeedbackFormById(id);
+        return ResponseEntity.ok(form);
+    }
+
+
+    // get all Feedback forms
+    @GetMapping("feedback")
+    public ResponseEntity<List<FeedbackForm>> getAllFeedbackForms(){
+        List<FeedbackForm> forms = feedbackFormService.getAllFeedbackForms();
+        return ResponseEntity.ok(forms);
+    }
+
+
+    // delete feedback form by id
+    @DeleteMapping("/feedback/{id}")
+    public ResponseEntity<Map<String, String>> deleteFeedbackFormById(@PathVariable Long id){
+        Map<String,String> response = new HashMap<>();
+        try{
+            feedbackFormService.deleteById(id);
+            response.put("message","Feedback form is deleted successfully.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message",e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
+
+
+
+    // update Feedback form
+    @PutMapping("feedback/{id}")
+    public ResponseEntity<Map<String,String>> updateFeedbackForm(@RequestBody FeedbackForm feedbackForm,
+                                                                 @PathVariable Long id)
+    {
+        Map<String,String> response = new HashMap<>();
+        try{
+            feedbackFormService.updateFeedbackForm(feedbackForm,id);
+            response.put("message","Feedback form is updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message",e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
 }
