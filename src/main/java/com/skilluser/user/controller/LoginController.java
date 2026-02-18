@@ -1,6 +1,7 @@
 package com.skilluser.user.controller;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,10 +9,8 @@ import java.util.stream.Collectors;
 
 import com.skilluser.user.dto.LoginResponse;
 import com.skilluser.user.fiegnclient.StudentEmploymentClient;
-import com.skilluser.user.model.ContactRequest;
-import com.skilluser.user.model.FeedbackForm;
-import com.skilluser.user.model.Role;
-import com.skilluser.user.model.User;
+import com.skilluser.user.model.*;
+import com.skilluser.user.repository.RecruitmentAccessRepository;
 import com.skilluser.user.repository.UserRepository;
 import com.skilluser.user.service.FeedbackFormService;
 import com.skilluser.user.service.ModuleService;
@@ -60,6 +59,8 @@ public class LoginController {
     private UserService userService;
     @Autowired
     private FeedbackFormService feedbackFormService;
+    @Autowired
+    private RecruitmentAccessRepository recruitmentAccessRepository;
 
 
     @PostMapping("/login")
@@ -100,6 +101,78 @@ public class LoginController {
             {
                 throw new BadCredentialsException("Invalid credentials");
             }
+
+
+            //  Recruiter Expiry Check
+          /*  if ("COMPANY_RECRUITER".equalsIgnoreCase(user.getRole()))
+            {
+                RecruitmentAccess access
+                        = recruitmentAccessRepository.findByUserIdAndActiveTrue(user.getId());
+
+                if (access == null)
+                {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of(
+                                    "message",
+                                    "Recruiter access not assigned. Contact college admin."
+                            ));
+                }
+
+                if (access.getExpiryDate().isBefore(LocalDate.now()))
+                {
+                    // Auto deactivate
+                    access.setActive(false);
+                    recruitmentAccessRepository.save(access);
+
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of(
+                                    "message",
+                                    "Your recruiter access has expired. Please contact college admin."
+                            ));
+                }
+            }
+*/
+
+
+            if ("COMPANY_RECRUITER".equalsIgnoreCase(user.getRole())) {
+
+                List<RecruitmentAccess> accessList =
+                        recruitmentAccessRepository
+                                .findByUserIdAndActiveTrue(user.getId());
+
+                if (accessList == null || accessList.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of(
+                                    "message",
+                                    "No placement access assigned. Contact admin."
+                            ));
+                }
+
+                boolean hasValidAccess = accessList.stream()
+                        .anyMatch(a ->
+                                a.getExpiryDate() != null &&
+                                        !a.getExpiryDate().isBefore(LocalDate.now())
+                        );
+
+                if (!hasValidAccess) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(Map.of(
+                                    "message",
+                                    "All recruiter access expired. Please contact college admin."
+                            ));
+                }
+
+                // Optional: Send accessible placement list
+                List<Long> validPlacementIds = accessList.stream()
+                        .filter(a ->
+                                a.getExpiryDate() != null &&
+                                        !a.getExpiryDate().isBefore(LocalDate.now()))
+                        .map(RecruitmentAccess::getPlacementId)
+                        .collect(Collectors.toList());
+
+                response.put("accessiblePlacements", validPlacementIds);
+            }
+
 
             List<String> roles = user.getAuthorities().stream()
                     .map(gr -> gr.getAuthority()) // ROLE_COMPANY, ROLE_COLLEGE, etc.

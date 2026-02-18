@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 @Entity
 @Data
-public class CustomRole {
-
+public class CustomRole
+{
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
