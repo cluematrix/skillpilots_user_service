@@ -100,18 +100,38 @@ public class NotificationConsumerServiceImpl implements NotificationConsumerServ
             notification.setReceiverId(user.getId());
             notification.setDeptId(user.getDepartment());
 
+
             notificationRepository.save(notification);
+
+            // ⭐ create new event for each user
+            NotificationEvent userEvent = new NotificationEvent(
+                    event.getType(),
+                    event.getMessage(),
+                    event.getTargetRoles(),
+                    event.getCollegeId(),
+                    event.getDeptId(),
+                    event.getStudentId(),
+                    event.getCompanyId(),
+                    event.getPath(),
+                    notification.getNotificationId()   // correct id
+            );
+
+            //  Send real-time notification via WebSocket to each target user
+            messagingTemplate.convertAndSend(
+                    "/topic/notifications/" + user.getId(),
+                    userEvent
+            );
         }
 
 
         System.out.println("taregetUsers>>>>>>>"+targetUsers);
         //  Send real-time notification via WebSocket to each target user
-        for (User user : targetUsers) {
-            messagingTemplate.convertAndSend(
-                    "/topic/notifications/" + user.getId(),
-                    event
-            );
-        }
+//        for (User user : targetUsers) {
+//            messagingTemplate.convertAndSend(
+//                    "/topic/notifications/" + user.getId(),
+//                    event
+//            );
+//        }
 
         System.out.println(" Sent notification to " + targetUsers.size() + " users.");
         System.out.println("Target Roles: " + event.getTargetRoles());

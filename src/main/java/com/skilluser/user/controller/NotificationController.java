@@ -2,10 +2,13 @@ package com.skilluser.user.controller;
 
 import com.skilluser.user.model.Notification;
 import com.skilluser.user.repository.NotificationRepository;
+import com.skilluser.user.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,8 @@ import java.util.Map;
 public class NotificationController {
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     // get user notification by user id
     @GetMapping("/{userId}")
@@ -29,8 +34,23 @@ public class NotificationController {
     // get all unread notifications - 23/01/2026
     @GetMapping("/unread/{userId}")
     public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long userId) {
-        List<Notification> notifications = notificationRepository.findByReceiverIdAndReadStatusFalseOrderByCreatedAtDesc(userId);
+
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+        // delete notifications from database one month old notification
+        notificationService.deleteOld(oneMonthAgo);
+
+        // fetch all notification by user id only latest notification within one month
+        List<Notification> notifications = notificationService.getUnread(userId);
+
         return ResponseEntity.ok(notifications);
+    }
+
+
+    @Transactional
+    private void deleteOld(LocalDateTime date) {
+        int count = notificationRepository.deleteAllOld(date);
+        System.out.println("Deleted rows: " + count);
     }
 
 
@@ -48,10 +68,13 @@ public class NotificationController {
         // mark read (logical)
         notification.setReadStatus(true);
 
-        // delete immediately
-        notificationRepository.delete(notification);
+//        // delete immediately
+//        notificationRepository.delete(notification);
 
-        response.put("message", "Notification read and removed successfully");
+        // save in database
+        notificationRepository.save(notification);
+
+        response.put("message", "Notification read and saved successfully");
         return ResponseEntity.ok(response);
     }
 }

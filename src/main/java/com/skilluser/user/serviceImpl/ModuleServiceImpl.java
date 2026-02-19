@@ -203,7 +203,7 @@ public class ModuleServiceImpl implements ModuleService {
 
                 perm.setRole(role);
                 perm.setModule(module);
-                perm.setPath(req.getPath());
+                perm.setPath(module.getPath());
                 perm.setCanView(req.isCanView());
                 perm.setCanAdd(req.isCanAdd());
                 perm.setCanEdit(req.isCanEdit());

@@ -122,7 +122,12 @@ public class AppConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/colleges/**").hasRole("COLLEGE")
+                       // .requestMatchers("/api/v1/colleges/**").hasRole("COLLEGE")
+
+                       // .requestMatchers("/api/v1/colleges/recruiter/**").hasRole("COMPANY_RECRUITER")
+
+                        .requestMatchers("/api/v1/colleges/**").hasAnyRole("COLLEGE", "COMPANY_RECRUITER")
+
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(ex -> ex

@@ -56,6 +56,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private OtpService otpService;
     @Autowired
     private  StudentWorkStatusService workStatusService;
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -310,24 +313,68 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return String.valueOf(otp);
     }
 
+//    public Map<String, Object> buildProfile(Long userId, Claims claims) {
+//
+//        Map<String, Object> workStatus =workStatusService. getWorkStatus(userId);
+//        String username = userRepository.findById(userId)
+//                .map(User::getName)
+//                .orElse("NA");
+//
+//        Map<String, Object> permissions = moduleService.getPermissionsForUser(userId);
+//        boolean given = assessmentCheckRepository.hasGivenAnyAssessment(userId);
+//
+//        return Map.of(
+//                "valid", true,
+//                "user", claims,
+//                "permission", permissions,
+//                "name", username,
+//                "work_status", workStatus,
+//                "hasGivenSkillAssessment", given
+//        );
+//    }
+
+
     public Map<String, Object> buildProfile(Long userId, Claims claims) {
 
-        Map<String, Object> workStatus =workStatusService. getWorkStatus(userId);
-        String username = userRepository.findById(userId)
-                .map(User::getName)
-                .orElse("NA");
+        Map<String, Object> workStatus = workStatusService.getWorkStatus(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String username = user.getName();
 
         Map<String, Object> permissions = moduleService.getPermissionsForUser(userId);
         boolean given = assessmentCheckRepository.hasGivenAnyAssessment(userId);
 
-        return Map.of(
-                "valid", true,
-                "user", claims,
-                "permission", permissions,
-                "name", username,
-                "work_status", workStatus,
-                "hasGivenSkillAssessment", given
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("valid", true);
+       // response.put("user", claims);
+        response.put("permission", permissions);
+        response.put("name", username);
+        response.put("work_status", workStatus);
+        response.put("hasGivenSkillAssessment", given);
+
+        // ==================================================
+        // ⭐ MODIFY USER OBJECT
+        // ==================================================
+        Map<String, Object> userMap = new HashMap<>(claims);
+
+        if (user.getRoles() != null &&
+                "HOD".equalsIgnoreCase(user.getRoles().getName())) {
+
+            Long deptId = user.getDepartment();
+
+            String deptName = Optional.ofNullable(
+                    departmentRepository.getDepartmentNameById(deptId)
+            ).orElse("N/A");
+
+            userMap.put("departmentName", deptName);
+        }
+
+        response.put("user", userMap);
+
+        return response;
     }
+
 
 }
