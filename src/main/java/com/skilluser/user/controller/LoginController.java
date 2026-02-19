@@ -74,7 +74,10 @@ public class LoginController {
             {
                 throw new BadCredentialsException("User not found");
             }
-
+            if ( user.getVerified() != 1) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Your profile is not active"));
+            }
             String rawPassword = loginRequest.getPassword();
             String storedPassword = user.getPassword(); // could be hashed or plain
 
