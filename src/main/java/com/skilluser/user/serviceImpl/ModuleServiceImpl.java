@@ -158,24 +158,31 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     @Override
-    public List<ModulePermission> getPermissionsForRole(Long roleId, Long collegeId, Long companyId) {
-//        List<ModulePermission> perms = modulePermissionRepository
-//                .findByRoleIdAndCollegeIdOrCompanyId(roleId, collegeId, companyId);
-//
-//        if (perms.isEmpty()) {
-//            perms = modulePermissionRepository.findByRoleIdAndIsDefaultTrue(roleId);
-//        }
-        List<ModulePermission> existingPermissions;
+    public List<ModulePermission> getPermissionsForRole(
+            Long roleId, Long collegeId, Long companyId) {
+
+        Set<ModulePermission> permissionSet = new HashSet<>();
+
+        // Default role permissions
+        List<ModulePermission> defaultPerms =
+                modulePermissionRepository.findByRoleId(roleId);
+        permissionSet.addAll(defaultPerms);
+
+        // College specific
         if (collegeId != null) {
-            existingPermissions = modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
-        } else if (companyId != null) {
-            existingPermissions = modulePermissionRepository.findByRoleIdAndCompanyId(roleId, companyId);
-        } else {
-            // Global / admin scope
-            existingPermissions = modulePermissionRepository
-                    .findByRoleIdAndCollegeIdIsNullAndCompanyIdIsNull(roleId);
+            List<ModulePermission> collegePerms =
+                    modulePermissionRepository.findByRoleIdAndCollegeId(roleId, collegeId);
+            permissionSet.addAll(collegePerms);
         }
-        return existingPermissions;
+
+        // Company specific
+        if (companyId != null) {
+            List<ModulePermission> companyPerms =
+                    modulePermissionRepository.findByRoleIdAndCompanyId(roleId, companyId);
+            permissionSet.addAll(companyPerms);
+        }
+
+        return new ArrayList<>(permissionSet);
     }
 
 
@@ -203,6 +210,7 @@ public class ModuleServiceImpl implements ModuleService {
                 perm.setCanDelete(req.isCanDelete());
                 perm.setCollegeId(collegeId);
                 perm.setCompanyId(companyId);
+                perm.setPath(module.getPath());
                 modulePermissionRepository.save(perm);
             }
 
