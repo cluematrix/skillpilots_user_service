@@ -134,13 +134,13 @@ public class LoginController {
 */
 
 
-            if ("COMPANY_RECRUITER".equalsIgnoreCase(user.getRole())) {
+            if ("COMPANY_RECRUITER".equalsIgnoreCase(user.getRole()))
+            {
+                List<RecruitmentAccess> accessList
+                        = recruitmentAccessRepository.findByUserIdAndActiveTrue(user.getId());
 
-                List<RecruitmentAccess> accessList =
-                        recruitmentAccessRepository
-                                .findByUserIdAndActiveTrue(user.getId());
-
-                if (accessList == null || accessList.isEmpty()) {
+                if (accessList == null || accessList.isEmpty())
+                {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                             .body(Map.of(
                                     "message",
@@ -154,7 +154,8 @@ public class LoginController {
                                         !a.getExpiryDate().isBefore(LocalDate.now())
                         );
 
-                if (!hasValidAccess) {
+                if (!hasValidAccess)
+                {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                             .body(Map.of(
                                     "message",
